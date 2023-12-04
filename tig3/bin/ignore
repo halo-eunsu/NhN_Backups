@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+
+# gitignore를 고친 후 곧바로 적용
+git rm -r --cached . #추적하고 있는 파일 목록을 cache에서 삭제
+git add .
+git commit -m "Apply .gitignore"

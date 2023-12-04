@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+if [ -z "${TIG_ENV}" ]; then
+  echo "Error: \". bin/begin_tig\" first."
+  return 1
+fi
+
+exec docker-compose --file ${TIG_ENV}/docker-compose.yml $*

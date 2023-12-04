@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+[ "$( status $1 )" = "running" ]

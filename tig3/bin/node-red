@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+args=$*
+if [ $# -eq 0 ] ; then
+  args=bash
+fi
+
+tig exec node-red $args

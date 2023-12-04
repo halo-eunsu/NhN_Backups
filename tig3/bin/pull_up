@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+pull > /dev/null 2>&1 &&
+  up `running_services`

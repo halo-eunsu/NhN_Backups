@@ -1,0 +1,53 @@
+#!/usr/bin/env sh
+
+# set -eu # for debugging
+rehash () {
+  # Re-hash for bash or zsh
+  if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ] ; then
+    hash -r
+  fi
+}
+
+end_tig () {
+    # reset old environment variables
+    if [ -n "${_OLD_TIG_PATH:-}" ] ; then
+        PATH="${_OLD_TIG_PATH:-}"
+        export PATH
+        unset _OLD_TIG_PATH
+    fi
+
+    rehash
+
+    if [ -n "${_OLD_TIG_PS1:-}" ] ; then
+        PS1="${_OLD_TIG_PS1:-}"
+        export PS1
+        unset _OLD_TIG_PS1
+    fi
+
+    unset TIG_ENV
+    if [ ! "$1" = "nondestructive" ] ; then
+    # Self destruct!
+        unset -f end_tig
+    fi
+}
+
+# unset irrelevant variables but 'end_tig'
+end_tig nondestructive
+
+TIG_ENV="$(pwd)"
+export TIG_ENV
+
+_OLD_TIG_PATH="$PATH"
+PATH="$TIG_ENV/bin:$PATH"
+export PATH
+
+_OLD_TIG_PS1="${PS1:-}"
+PS1="TIG ${PS1:-}"
+export PS1
+
+TIG_GROUP_ID=$(id -g ${USER})
+export TIG_GROUP_ID
+TIG_USER_ID=$(id -u ${USER})
+export TIG_USER_ID
+
+rehash

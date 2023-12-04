@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source config.sh 
+
+pub --id 온도계 --topic $status --null-message --retain

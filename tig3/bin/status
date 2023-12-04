@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+for service in $*
+do
+  docker container inspect -f '{{.State.Status}}' $service
+done

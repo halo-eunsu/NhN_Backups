@@ -1,0 +1,6 @@
+CREATE USER futureict WITH PASSWORD 'futureict_1101' WITH ALL PRIVILEGES
+create database system
+create retention policy monthly on system duration 30d replication 1 default;
+create database mqtt
+create retention policy yearly on mqtt duration 365d replication 1 default;  
+create retention policy monthly on mqtt duration 30d replication 1;

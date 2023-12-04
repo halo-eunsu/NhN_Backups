@@ -1,0 +1,7 @@
+#!/bin/bash
+
+source config.sh 
+
+id=측정온도
+get --id 모니터 --topic $status &
+sub --id ${id} --topic $status --topic $topic -C $n_messages -W $timeout

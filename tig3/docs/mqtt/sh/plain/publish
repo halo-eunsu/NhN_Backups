@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source config.sh
+
+repeat $n_messages rand -50 50 | pub --id 발행 --topic $topic --stdin-line

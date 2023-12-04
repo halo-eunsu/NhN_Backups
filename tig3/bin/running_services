@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+for service in `services`
+do
+  if is_running $service ; then
+    echo $service
+  fi
+done

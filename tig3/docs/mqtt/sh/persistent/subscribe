@@ -1,0 +1,15 @@
+#!/bin/bash
+
+source config.sh
+
+clean() {
+    sub --id S --topic $topic $*
+}
+
+persist() {
+    clean --disable-clean-session $*
+}
+
+# persist -E --qos $1
+persist -C $n_messages --qos $1
+# clean -E

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+source config.sh
+
+for receiver_qos in 0 1 2
+do
+    for sender_qos in 0 1 2
+    do
+        sub --id S --topic $topic -C 3 --qos $receiver_qos
+    done
+done

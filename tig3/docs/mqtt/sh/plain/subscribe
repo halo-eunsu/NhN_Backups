@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source config.sh
+
+for client in clean_session clean_start subscriber
+do
+    $client --topic $topic -C $n_messages &
+done

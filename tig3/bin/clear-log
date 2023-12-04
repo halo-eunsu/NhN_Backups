@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+CONTAINER=$1
+
+if [[ -z $CONTAINER ]]; then
+    echo "No container specified"
+    exit 1
+fi
+
+CONTAINER_ID=$(docker ps --all --quiet \
+                         --filter name=^/${CONTAINER}$ 2> /dev/null)
+if [[ "$CONTAINER_ID" == "" ]]; then
+    echo "Container \"$CONTAINER\" does not exist, exiting."
+    exit 1
+fi
+
+log=$(docker inspect --format '{{.LogPath}}' $CONTAINER 2> /dev/null)
+sudo truncate -s 0 $log

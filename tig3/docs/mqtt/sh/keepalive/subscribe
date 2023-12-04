@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source config.sh
+
+sub --id 모니터 --topic $topic -C $n_messages --keepalive $timeout $*

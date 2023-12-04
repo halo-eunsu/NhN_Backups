@@ -1,0 +1,14 @@
+#!/bin/bash
+
+source config.sh
+
+for receiver_qos in 0 1 2
+do
+    for sender_qos in 0 1 2
+    do
+        for i in 0 1 2
+        do
+            echo "($sender_qos,$i)"
+        done | pub --id P --topic $topic --qos $sender_qos --stdin-line
+    done
+done

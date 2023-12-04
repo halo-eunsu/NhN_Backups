@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+for service in `services`
+do
+  if is_running $service ; then
+    clear-log $service
+  fi
+done

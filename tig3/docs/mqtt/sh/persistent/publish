@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source config.sh
+
+repeat 2 'echo M$1' | pub --id P --topic $topic --disable-clean-session --stdin-line --qos $1

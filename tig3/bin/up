@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+
+MAX=30
+for service in $*
+do
+  if tig up -d $service; then
+    n=0
+    while [ $n -lt $MAX ] ; do
+      if is_running $service ; then echo $service; break; fi
+      n=`expr $n + 1`
+    done
+  fi
+done

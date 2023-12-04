@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+tig-in &&
+  git checkout -- var/lib/grafana/grafana.db &&
+  git pull

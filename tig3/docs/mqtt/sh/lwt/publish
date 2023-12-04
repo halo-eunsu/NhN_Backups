@@ -1,0 +1,20 @@
+#!/bin/bash
+source config.sh 
+
+id=P
+
+# --will-qos 0  유언이 적어도 한번은 알려져야 하지 않나? 어쨌거나 기본은 0 
+# --will-retain 비정상 단절로 유언(LWT)을 남기면 이를 유지(Retain)
+
+    # --will-retain \
+
+for i in `seq 1 $n_messages`
+do
+    echo $i; sleep 3
+done |                                          \
+pub --id $id \
+    --topic $topic \
+    --will-topic $status \
+    --will-payload "나빠" \
+    --will-retain \
+    --stdin-line
