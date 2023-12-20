@@ -1,0 +1,19 @@
+# merge-sort
+
+* 병합 정렬을 구현합니다.
+
+** https://en.wikipedia.org/wiki/Merge_sort[Merge Sort - Wikipedia]
+
+[source,java]
+----
+include::src/main/java/com/nhnacademy/aiot/MergeSort.java[]
+----
+
+---
+
+* 아래의 테스트 코드가 통과할 수 있게 작성합니다.
+
+[source,java]
+----
+include::src/test/java/com/nhnacademy/aiot/MergeSortTest.java[]
+----
