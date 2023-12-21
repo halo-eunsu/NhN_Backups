@@ -1,0 +1,85 @@
+= 변수 사용
+
+* PL/SQL
+[source, sql]
+----
+-- 변수 선언
+<variable_name> <variable_type> := <initial_value>
+-- 상수 선언
+<constant_name>  CONSTANT <constant_type> := <initial_value>
+----
+* T-SQL
+[source, sql]
+----
+-- 변수 선언
+DECLARE @<variable_name> <variable_type> = <initial_value>
+-- 변수에 값 할당
+SET @<variable_name> = <value>
+SELECT @<variable_name> = <value>
+----
+* MySQL
+[source, sql]
+----
+-- 변수 선언
+SET @<variable_name> = expression
+SET @<variable_name> := expression
+----
+
+---
+
+== PL/SQL
+
+PL/SQL은 상용 관계 데이터베이스 관리 시스템인 Oracle이 SQL 언어를 확장하여 만든 언어입니다. PL/SQL 에서 변수를 선언하는 방법은 아래와 같습니다.
+
+_**DECLARE**_ 사용
+[source, sql]
+----
+--변수 선언
+EX_NUM NUMBER  := 1;
+EX_STR VARCHAR2(10) := 'STR1';
+
+--상수 선언
+EX_NUM CONSTANT NUMBER  := 1;
+
+BEGIN
+	DBMS_OUTPUT.PUT_LINE(V_NUM);
+	DBMS_OUTPUT.PUT_LINE(V_STR);
+END;
+----
+
+== T-SQL
+
+T-SQL은 상용 관계 데이터베이스 시스템인 Sybase에서 SQL 언어를 확장하여 만든 언어입니다. Sybase에 기반을 두고 있는 Microsoft SQL Server에서도 사용되고 있습니다.
+
+[source, sql]
+----
+DECLARE @i int = 0
+SET @i = 1
+SELECT @i = 10
+
+PRINT(@i)
+----
+
+== MySQL
+
+MySQL에서 사용하는 SQL은 자체적인 사용자 정의 변수를 지원합니다.
+
+----
+mysql> SET @i = 0;
+mysql> SET @i := 1;
+mysql> SET @i = 10;
+mysql> SELECT @i;
+----
+
+== PostgreSQL
+
+PostgreSQL은 PL/pgSQL이라고 불리는 SQL 언어를 제공합니다. 이름에서 알 수 있듯이 Oracle의 PL/SQL과 상당히 비슷합니다. PL/pgSQL은 declare를 제공하지 않아, WITH 문을 사용하여 임시 테이블 형태로 변수를 만들어 사용할 수 있습니다.
+
+[source, sql]
+----
+WITH myvar (var1) AS (values(1))  
+
+SELECT var1 FROM myvar;  
+----
+
+link:./05_flow_control.adoc[다음: 흐름 제어]

@@ -1,0 +1,893 @@
+FunctionNode.java
+
+package com.nhnacademy.node;
+
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+import org.json.simple.JSONObject;
+
+import com.nhnacademy.message.JsonMessage;
+import com.nhnacademy.message.Message;
+import com.nhnacademy.system.NodeRedSystem;
+import com.nhnacademy.wire.Wire;
+
+import lombok.extern.slf4j.Slf4j;
+
+/*
+ * 수정 필요
+ */
+
+@Slf4j
+public class FunctionNode extends InputOutputNode {
+    private String func;
+    private ScriptEngineManager manager = new ScriptEngineManager();
+    private String z;
+
+    public FunctionNode(String id, int outCount, String func, String z) {
+        super(id, outCount);
+        this.func = func;
+        this.z = z;
+    }
+
+    public FunctionNode(int outCount, String func, String z) {
+        super(outCount);
+        this.func = func;
+        this.z = z;
+    }
+
+    @Override
+    void process() {
+        for (int i = 0; i < getInputWireCount(); i++) {
+            Wire wire = getInputWire(i);
+            if (wire == null || !wire.hasMessage())
+                continue;
+            Message message = wire.get();
+            JSONObject jsonObject = ((JsonMessage) message).getJsonObject();
+            ScriptEngine engine = manager.getEngineByName("JavaScript");
+            engine.put("msg", jsonObject);
+            engine.put("flow", NodeRedSystem.getInstance().getFlow(z));
+            try {
+                engine.eval(func);
+                JSONObject msgJsonObject = (JSONObject) engine.get("msg");
+                JSONObject flowJsonObject = (JSONObject) engine.get("flow");
+                NodeRedSystem.getInstance().getFlow(z).setFlowJsonObject(flowJsonObject);
+                output(0, new JsonMessage(msgJsonObject));
+            } catch (ScriptException e) {
+                log.info(getId() + " ScriptException", e);
+            }
+        }
+    }
+}
+
+InputOutputNode.java
+
+package com.nhnacademy.node;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.nhnacademy.exception.AlreadyExistsException;
+import com.nhnacademy.exception.NotExistsException;
+import com.nhnacademy.exception.OutOfBoundsException;
+import com.nhnacademy.message.Message;
+import com.nhnacademy.wire.Wire;
+
+public abstract class InputOutputNode extends ActiveNode {
+    List<Wire> inputPort;
+    List<Wire>[] outputPort;
+
+    protected InputOutputNode(String id, int outCount) {
+        super(id);
+
+        if (outCount < 0) {
+            throw new OutOfBoundsException("outCount is out of bounds");
+        }
+
+        inputPort = new ArrayList<>();
+        outputPort = new ArrayList[outCount];
+        for (int i = 0; i < outCount; i++) {
+            outputPort[i] = new ArrayList<>();
+        }
+    }
+
+    protected InputOutputNode(int outCount) {
+        super();
+
+        inputPort = new ArrayList<>();
+        outputPort = new ArrayList[outCount];
+        for (int i = 0; i < outCount; i++) {
+            outputPort[i] = new ArrayList<>();
+        }
+    }
+
+    public void connectOutputWire(int index, Wire wire) {
+        if (index < 0 || index >= getOutputCount()) {
+            throw new OutOfBoundsException("index is out of bounds");
+        }
+
+        if (outputPort[index].contains(wire)) {
+            throw new AlreadyExistsException("Wire is already connected");
+        }
+
+        if (wire == null) {
+            throw new NullPointerException("Wire is null");
+        }
+
+        outputPort[index].add(wire);
+    }
+
+    public void disconnectOutputWire(int index, Wire wire) {
+        if (index < 0 || index >= getOutputCount()) {
+            throw new OutOfBoundsException();
+        }
+
+        if (!outputPort[index].contains(wire)) {
+            throw new NotExistsException("Wire is not connected");
+        }
+
+        if (wire == null) {
+            throw new NullPointerException("Wire is null");
+        }
+
+        outputPort[index].remove(wire);
+    }
+
+    public int getOutputCount() {
+        return outputPort.length;
+    }
+
+    public int getOutputWireCount(int index) {
+        if (index < 0 || index >= getOutputCount()) {
+            throw new OutOfBoundsException("index is out of bounds");
+        }
+
+        return outputPort[index].size();
+    }
+
+    public void connectInputWire(Wire wire) {
+        if (inputPort.contains(wire)) {
+            throw new AlreadyExistsException("Wire is already connected");
+        }
+
+        if (wire == null) {
+            throw new NullPointerException("Wire is null");
+        }
+
+        inputPort.add(wire);
+    }
+
+    public void disconnectInputWire(Wire wire) {
+        if (!inputPort.contains(wire)) {
+            throw new NotExistsException("Wire is not connected");
+        }
+
+        if (wire == null) {
+            throw new NullPointerException("Wire is null");
+        }
+
+        inputPort.remove(wire);
+    }
+
+    public int getInputWireCount() {
+        return inputPort.size();
+    }
+
+    public Wire getInputWire(int index) {
+        if (index < 0 || index >= getInputWireCount()) {
+            throw new OutOfBoundsException("index is out of bounds");
+        }
+
+        return inputPort.get(index);
+    }
+
+    void output(int index, Message message) {
+        for (Wire wire : outputPort[index]) {
+            if (wire != null) {
+                wire.put(message);
+            }
+        }
+    }
+}
+
+ActiveNode.java
+
+package com.nhnacademy.node;
+
+/**
+ * ActiveNode는 스레드로 구현 됨 노드와 스레드를 구현(Extends, Implements)
+ * constructor 는 스레드 생성, 이름 지정.
+ */
+public abstract class ActiveNode extends Node implements Runnable {
+    Thread thread;
+    boolean running;
+    long interval = 1000;
+
+    ActiveNode() {
+        super();
+        thread = new Thread(this, getId());
+        running = false;
+    }
+
+    ActiveNode(String name) {
+        this();
+        setName(name);
+    }
+
+    @Override
+    public String getName() {
+        return thread.getName();
+    }
+
+    @Override
+    public void setName(String name) {
+        thread.setName(name);
+    }
+
+    public long getInterval() {
+        return interval;
+    }
+
+    public void setInterval(long interval) {
+        this.interval = interval;
+    }
+
+    public void start() {
+        thread.start();
+    }
+
+    public void stop() {
+        running = false;
+        thread.interrupt();
+    }
+
+    abstract void preprocess();
+
+    abstract void process();
+
+    abstract void postprocess();
+
+    @Override
+    public void run() {
+        preprocess();
+
+        running = true;
+
+        long startTime = System.currentTimeMillis();
+        long previousTime = startTime;
+
+        while (running) {
+            long currentTime = System.currentTimeMillis();
+            long elapsedTime = currentTime - previousTime;
+
+            if (elapsedTime < interval) {
+                try {
+                    process();
+                    Thread.sleep(interval - elapsedTime);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+
+            previousTime = startTime + (System.currentTimeMillis() - startTime) / interval * interval;
+        }
+        postprocess();
+    }
+}
+
+
+OutputNode.java
+
+package com.nhnacademy.node;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.nhnacademy.exception.InvalidArgumentException;
+import com.nhnacademy.wire.Wire;
+
+public abstract class OutputNode extends ActiveNode {
+    private List<Wire> inputPort;
+
+    protected OutputNode(String id) {
+        super(id);
+        inputPort = new ArrayList<>();
+    }
+
+    protected OutputNode() {
+        super();
+        inputPort = new ArrayList<>();
+    }
+
+    public void connectInputWire(Wire wire) {
+        if (wire == null) {
+            throw new InvalidArgumentException();
+        }
+
+        inputPort.add(wire);
+    }
+
+    public int getInputWireCount() {
+        return inputPort.size();
+    }
+
+    public Wire getInputWire(int index) {
+        if (index < 0 || index >= getInputWireCount()) {
+            throw new InvalidArgumentException();
+        }
+
+        return inputPort.get(index);
+    }
+}
+
+Node.java
+
+package com.nhnacademy.node;
+
+import lombok.extern.slf4j.Slf4j;
+
+/**
+ * @field count 생성된 노드 개수
+ * @field id 각 노드의 id
+ */
+@Slf4j
+public abstract class Node {
+
+    static int count;
+    String id;
+
+    Node() {
+        count++;
+        id = String.format("%s-%02d", getClass().getSimpleName(), count);
+        log.trace("create node : {}", id);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public abstract String getName();
+
+    public abstract void setName(String name);
+
+    public static int getCount() {
+        return count;
+    }
+}
+
+
+MqttInNode.java
+
+package com.nhnacademy.node;
+
+import java.util.UUID;
+
+import org.eclipse.paho.client.mqttv3.IMqttClient;
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import com.nhnacademy.message.JsonMessage;
+import com.nhnacademy.system.SystemOption;
+
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class MqttInNode extends InputNode {
+    private IMqttClient client;
+    private JSONObject jsonObject;
+
+    public MqttInNode(int count, JSONObject jsonObject) {
+        super(count);
+        this.jsonObject = jsonObject;
+    }
+
+    public MqttInNode(JSONObject jsonObejct) {
+        this(1, jsonObejct);
+    }
+
+    @Override
+    void preprocess() {
+        String publisherId;
+        publisherId = UUID.randomUUID().toString();
+
+        try {
+            client = new MqttClient(jsonObject.get("server").toString(), publisherId,
+                    new MqttDefaultFilePersistence("./target/trash"));
+
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * MQTT 클라이언트를 통해 메시지를 처리하는 메서드입니다.
+     * 이 메서드는 노드가 살아있는 동안 반복적으로 실행되며, MQTT 연결 상태를 확인합니다.
+     * 연결되지 않은 경우, 새로운 연결을 시도합니다.
+     * MQTT 클라이언트를 구독하고, 수신된 메시지를 처리합니다.
+     * JSON 형식의 메시지를 파싱하고 로깅합니다.
+     *
+     * process()는 MqttException을 발생시킬 수 있으며,
+     * 특히 이미 연결된 경우 또는 연결에 실패했을 때 이를 처리합니다.
+     * MQTTcode 32100 이미 연결된 상태에서 다시 연결을 시도할 경우
+     * 
+     * @throws MqttException MQTT 연결 오류 또는 구독 중 오류가 발생한 경우
+     */
+    @Override
+    void process() {
+
+        try {
+            MqttConnectOptions options = new MqttConnectOptions();
+            options.setAutomaticReconnect(true);
+            options.setCleanSession(true);
+            options.setConnectionTimeout(10);
+
+            if (!(client.isConnected())) {
+                client.connect(options);
+            }
+
+            String topicDirectory = "application";
+            // (sOptions.getApplicationName() != null ? sOptions.getApplicationName()
+            // : "application");
+
+            client.subscribe(topicDirectory + "/+/device/+/event/up/#", (topic, msg) -> {
+                try {
+                    JSONParser parser = new JSONParser();
+                    Object obj = parser.parse(new String(msg.getPayload()));
+                    if (!(obj instanceof JSONObject)) {
+                        throw new IllegalStateException();
+                    }
+                    JSONObject jsonObj = (JSONObject) obj;
+                    // log.trace(jsonObj.toString());
+                    JsonMessage messageObject = new JsonMessage(jsonObj);
+                    messageObject.setNodeName("MqttInNode");
+                    for (int i = 0; i < getOutputCount(); i++) {
+                        output(messageObject, i);
+                        log.info(messageObject.toString());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
+
+        } catch (MqttException e) {
+            if (e.getReasonCode() == 32100) {
+                log.info("Client is already connected.");
+            } else {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    void postprocess() {
+        try {
+            client.close();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+InputNode.java
+
+package com.nhnacademy.node;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.nhnacademy.exception.AlreadyExistsException;
+import com.nhnacademy.exception.InvalidArgumentException;
+import com.nhnacademy.exception.NotExistsException;
+import com.nhnacademy.exception.OutOfBoundsException;
+import com.nhnacademy.message.Message;
+import com.nhnacademy.wire.Wire;
+
+public abstract class InputNode extends ActiveNode {
+    List<Wire>[] outputPort;
+
+    protected InputNode(String id, int outCount) {
+        super(id);
+
+        if (outCount < 0) {
+            throw new OutOfBoundsException("outCount is out of bounds");
+        }
+
+        outputPort = new ArrayList[outCount];
+        for (int i = 0; i < outCount; i++) {
+            outputPort[i] = new ArrayList<>();
+        }
+    }
+
+    protected InputNode(int outCount) {
+        super();
+
+        if (outCount < 0) {
+            throw new OutOfBoundsException("outCount is out of bounds");
+        }
+
+        outputPort = new ArrayList[outCount];
+        for (int i = 0; i < outCount; i++) {
+            outputPort[i] = new ArrayList<>();
+        }
+    }
+
+    public void connectOutputWire(int index, Wire wire) {
+        if (index < 0 || index >= getOutputCount()) {
+            throw new OutOfBoundsException("index is out of bounds");
+        }
+
+        if (wire == null) {
+            throw new InvalidArgumentException("Wire is null");
+        }
+
+        if (outputPort[index].contains(wire)) {
+            throw new AlreadyExistsException("Wire is already connected");
+        }
+
+        outputPort[index].add(wire);
+    }
+
+    public void disconnectOutputWire(int index, Wire wire) {
+        if (index < 0 || index >= getOutputCount()) {
+            throw new OutOfBoundsException("index is out of bounds");
+        }
+
+        if (wire == null) {
+            throw new InvalidArgumentException("Wire is null");
+        }
+
+        if (!outputPort[index].contains(wire)) {
+            throw new NotExistsException("Wire is not connected");
+        }
+
+        outputPort[index].remove(wire);
+    }
+
+    public int getOutputCount() {
+        return outputPort.length;
+    }
+
+    public int getOutputWireCount(int index) {
+        if (index < 0 || index >= getOutputCount()) {
+            throw new OutOfBoundsException("index is out of bounds");
+        }
+
+        return outputPort[index].size();
+    }
+
+    void output(Message message, int index) {
+        for (Wire wire : outputPort[index]) {
+            if (wire != null) {
+                wire.put(message);
+            }
+        }
+    }
+
+}
+
+MqttOutNode.java
+
+package com.nhnacademy.node;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.text.ParseException;
+
+import org.eclipse.paho.client.mqttv3.MqttClient;
+import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
+import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
+
+import com.nhnacademy.message.JsonMessage;
+import com.nhnacademy.message.Message;
+import com.nhnacademy.system.SystemOption;
+import com.nhnacademy.wire.Wire;
+import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+@Slf4j
+public class MqttOutNode extends OutputNode {
+
+    private String broker;
+    private MqttClient client;
+    private String path = "src/main/resources/systemSetting.json";
+
+    public MqttOutNode() {
+        super();
+    }
+
+    public MqttOutNode(String name) {
+        super(name);
+
+        // this.broker = broker;
+
+        try {
+            JSONParser jsonParser = new JSONParser();
+            JSONObject systemSettings;
+
+            systemSettings = (JSONObject) jsonParser.parse(new FileReader(path));
+
+            JSONObject outputSettings = (JSONObject) systemSettings.get("output");
+            if (outputSettings != null) {
+                Object serverValue = outputSettings.get("server");
+                if (serverValue != null) {
+                    this.broker = serverValue.toString();
+                }
+            }
+
+        } catch (IOException | org.json.simple.parser.ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    void preprocess() {
+        try {
+            client = new MqttClient(broker, MqttClient.generateClientId(),
+                    new MqttDefaultFilePersistence("./target/trash"));
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    void process() {
+        sendToTelegraf();
+    }
+
+    public void sendToTelegraf() {
+        try {
+            MqttConnectOptions options = new MqttConnectOptions();
+            options.setAutomaticReconnect(true);
+            options.setCleanSession(true);
+            client.connect(options);
+
+            Wire inputWire = getInputWire(0);
+            if (inputWire != null) {
+                while (inputWire.hasMessage()) {
+                    Message message = inputWire.get();
+
+                    if (message instanceof JsonMessage) {
+                        JsonMessage jsonMessage = (JsonMessage) message;
+                        JSONObject messageJsonObject = jsonMessage.getJsonObject();
+
+                        client.publish(messageJsonObject.get("topic").toString(), new MqttMessage(
+                                messageJsonObject.get("payload").toString().getBytes()));
+                    }
+                }
+
+            }
+
+            client.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    void postprocess() {
+        try {
+            client.close();
+        } catch (MqttException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+SwitchNode.java
+
+package com.nhnacademy.node;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
+/*
+ * 일단 여기 들어오는 데이터는 데이터를 확인한 후 해당 키 가 있는지 확인 하거나 아니면
+ * 일단 기준이 프로퍼티가 기준이네
+ */
+
+public class SwitchNode extends InputOutputNode {
+    private String property;
+    private String[] payload;
+    private JSONObject nodeSetting;
+
+    public SwitchNode(int inCount, int outCount, JSONObject nodeSetting) {
+        super(outCount);
+        this.nodeSetting = nodeSetting;
+    }
+
+    public SwitchNode(String name, int inCount, int outCount, JSONObject nodeSetting) {
+        super(name, outCount);
+        this.nodeSetting = nodeSetting;
+    }
+
+    private void nodeSetting() {
+        JSONArray rules = (JSONArray) nodeSetting.get("rules");
+        property = nodeSetting.get("property").toString();
+    }
+
+    @Override
+    void preprocess() {
+        // 여기서 프로펄티 기준으로 스플릿 해야함
+        payload = property.split(".");
+
+    }
+
+    @Override
+    void process() {
+
+    }
+
+    @Override
+    void postprocess() {
+
+    }
+}
+
+
+DebugNode.java
+
+package com.nhnacademy.node;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.json.simple.JSONObject;
+import com.nhnacademy.message.JsonMessage;
+import com.nhnacademy.message.Message;
+import com.nhnacademy.wire.Wire;
+
+public class DebugNode extends OutputNode {
+
+    String path = "src/test/java/logs.json";
+    String nodeName = "";
+
+    public DebugNode() {
+        super();
+    }
+
+    public DebugNode(String name) {
+        super(name);
+    }
+
+    @Override
+    void process() {
+        sendToLogs();
+    }
+
+    public void sendToLogs() {
+        try {
+            Wire inputWire = getInputWire(0);
+            if (inputWire != null) {
+                while (inputWire.hasMessage()) {
+                    Message message = inputWire.get();
+
+                    if (message instanceof JsonMessage) {
+                        JsonMessage jsonMessage = (JsonMessage) message;
+                        // parse한 객체 생성
+
+                        JSONObject jsonlog = createJsonLog(jsonMessage);
+
+                        // 파일이 없으면 생성
+                        File file = new File(path);
+                        if (!file.exists()) {
+                            try {
+                                file.createNewFile();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        // 기존 데이터 읽어오기
+                        List<String> existingData = readExistingData(file);
+
+                        // 새로운 데이터 추가
+
+                        // existingData.add(jsonMessage.getJsonObject().toJSONString());
+                        existingData.add(jsonlog.toJSONString());
+
+                        // JSON 파일 쓰기
+                        writeDataToFile(file, existingData);
+
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<String> readExistingData(File file) throws IOException {
+        List<String> existingData = new ArrayList<>();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                existingData.add(line);
+            }
+        }
+
+        return existingData;
+    }
+
+    private void writeDataToFile(File file, List<String> data) throws IOException {
+        try (PrintWriter out = new PrintWriter(new FileWriter(file))) {
+            for (String line : data) {
+                out.println(line);
+            }
+            System.out.println("Write success!");
+        }
+    }
+
+    private JSONObject createJsonLog(JsonMessage jsonMessage) {
+        JSONObject jsonLog = new JSONObject();
+
+        // "time" 값 추출
+        long timeValue = extractTimeValue(jsonMessage);
+        jsonLog.put("time", timeValue);
+
+        // "/p/class_a" 값 추출
+        String topic = jsonMessage.getJsonObject().get("topic").toString();
+        String[] topicParts = topic.split("/");
+        String placeValue = "";
+        for (String part : topicParts) {
+            if (part.equals("p")) {
+                placeValue = topicParts[Arrays.asList(topicParts).indexOf(part) + 1];
+                break;
+            }
+        }
+        jsonLog.put("place", placeValue);
+
+        jsonLog.put("id", this.getNodeName());
+
+        return jsonLog;
+    }
+
+    private long extractTimeValue(JsonMessage jsonMessage) {
+        Object payloadObj = jsonMessage.getJsonObject().get("payload");
+        if (payloadObj instanceof JSONObject) {
+            JSONObject payloadJson = (JSONObject) payloadObj;
+            Object timeObj = payloadJson.get("time");
+            if (timeObj instanceof Long) {
+                return (Long) timeObj;
+            }
+        }
+        return 0; // 기본 값 또는 오류 처리에 맞게 반환
+    }
+
+    public void setNodeName(String name) {
+        this.nodeName = name;
+
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    @Override
+    void preprocess() {
+        throw new UnsupportedOperationException("Unimplemented method 'preprocess'");
+    }
+
+    @Override
+    void postprocess() {
+        throw new UnsupportedOperationException("Unimplemented method 'postprocess'");
+    }
+
+}
+

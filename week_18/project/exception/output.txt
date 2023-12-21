@@ -1,0 +1,120 @@
+NotExistsException.java
+
+package com.nhnacademy.exception;
+
+public class NotExistsException extends RuntimeException {
+    public NotExistsException(String message) {
+        super(message);
+    }
+
+    public NotExistsException() {
+        super();
+    }
+}
+
+
+AlreadyExistsException.java
+
+package com.nhnacademy.exception;
+
+public class AlreadyExistsException extends RuntimeException {
+    public AlreadyExistsException(String message) {
+        super(message);
+    }
+
+    public AlreadyExistsException() {
+        super();
+    }
+}
+
+
+NonJSONObjectTypeException.java
+
+package com.nhnacademy.exception;
+
+public class NonJSONObjectTypeException extends RuntimeException {
+    public NonJSONObjectTypeException(String message) {
+        super(message);
+    }
+
+    public NonJSONObjectTypeException() {
+        super();
+    }
+}
+
+
+OutOfBoundsException.java
+
+package com.nhnacademy.exception;
+
+public class OutOfBoundsException extends RuntimeException {
+    public OutOfBoundsException(String message) {
+        super();
+    }
+
+    public OutOfBoundsException() {
+        super();
+    }
+}
+
+
+RulesFormatViolationException.java
+
+package com.nhnacademy.exception;
+
+public class RulesFormatViolationException extends RuntimeException {
+    public RulesFormatViolationException(String message) {
+        super(message);
+    }
+
+    public RulesFormatViolationException() {
+        super();
+    }
+
+}
+
+JSONMessageTypeException.java
+
+package com.nhnacademy.exception;
+
+public class JSONMessageTypeException extends RuntimeException {
+    public JSONMessageTypeException(String message) {
+        super(message);
+    }
+
+    public JSONMessageTypeException() {
+        super();
+    }
+}
+
+
+PropertyEmptyException.java
+
+package com.nhnacademy.exception;
+
+public class PropertyEmptyException extends RuntimeException {
+    public PropertyEmptyException(String message) {
+        super(message);
+    }
+
+    public PropertyEmptyException() {
+        super();
+    }
+}
+
+
+InvalidArgumentException.java
+
+package com.nhnacademy.exception;
+
+public class InvalidArgumentException extends RuntimeException {
+    public InvalidArgumentException(String message) {
+        super(message);
+    }
+
+    public InvalidArgumentException() {
+        super();
+    }
+}
+
+
