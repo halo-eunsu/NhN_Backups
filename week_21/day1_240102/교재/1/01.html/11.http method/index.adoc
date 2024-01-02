@@ -1,0 +1,142 @@
+= Http method 종류
+
+* *GET*
+** `GET` 메서드는 특정 리소스의 표시를 요청합니다.`GET` 을 사용하는 요청은 오직 데이터를 받기만 합니다.
+* HEAD
+** `HEAD`메서드는`GET`메서드의 요청과 동일한 응답을 요구하지만, 응답 본문을 포함하지 않습니다.
+* *POST*
+** `POST`메서드는 특정 리소스에 엔티티를 제출할 때 쓰입니다. 이는 종종 서버의 상태의 변화나 부작용을 일으킵니다.
+* *PUT*
+** `PUT`메서드는 목적 리소스 모든 현재 표시를 요청 payload로 바꿉니다.
+* *DELETE*
+** `DELETE`메서드는 특정 리소스를 삭제합니다.
+* OPTIONS
+** `OPTIONS`메서드는 목적 리소스의 통신을 설정하는 데 쓰입니다.
+* *PATCH*
+** `PATCH`메서드는 리소스의 부분만을 수정하는 데 쓰입니다.
+* CONNECT
+** `CONNECT`메서드는 목적 리소스로 식별되는 서버로의 터널을 맺습니다.
+* TRACE
+** `TRACE` 메서드는 목적 리소스의 경로를 따라 메시지 loop-back 테스트를 합니다.
+
+== 참고
+
+* https://developer.mozilla.org/ko/docs/Web/HTTP/Methods
+
+== GET test
+
+* https://httpbin.org/get?no=1&id=marco&age=30[https://httpbin.org/get?no=1&amp;id=marco&amp;age=30]
+
+[source,html]
+----
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <form method="get" action="https://httpbin.org/get">
+            <p><input type="number" name="no" placeholder="no"></p>
+            <p><input type="text" name="id" placeholder="id" ></p>
+            <p><input type="number" name="age" placeholder="age" ></p>
+            <p><button type="submit">submit</button></p>
+        </form>
+    </body>
+</html>
+
+----
+
+* 호출결과
+** args에 age, id, no 값을 확인할 수 있습니다.
+
+[source,json]
+----
+{
+  "args": {
+    "age": "30", 
+    "id": "marco", 
+    "no": "1"
+  }, 
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9", 
+    "Accept-Encoding": "gzip, deflate, br", 
+    "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7", 
+    "Cache-Control": "max-age=0", 
+    "Host": "httpbin.org", 
+    "Sec-Ch-Ua": "\"Google Chrome\";v=\"107\", \"Chromium\";v=\"107\", \"Not=A?Brand\";v=\"24\"", 
+    "Sec-Ch-Ua-Mobile": "?0", 
+    "Sec-Ch-Ua-Platform": "\"macOS\"", 
+    "Sec-Fetch-Dest": "document", 
+    "Sec-Fetch-Mode": "navigate", 
+    "Sec-Fetch-Site": "none", 
+    "Sec-Fetch-User": "?1", 
+    "Upgrade-Insecure-Requests": "1", 
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36", 
+    "X-Amzn-Trace-Id": "Root=1-63855227-074961e103899ece08c036d4"
+  }, 
+  "origin": "58.239.124.18", 
+  "url": "https://httpbin.org/get?no=1&id=marco&age=30"
+}
+----
+
+== Post test
+
+* https://httpbin.org/get?no=1&id=marco&age=30[https://httpbin.org/get]
+
+[source,html]
+----
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <form method="post" action="https://httpbin.org/post">
+            <p><input type="number" name="no" placeholder="no"></p>
+            <p><input type="text" name="id" placeholder="id" ></p>
+            <p><input type="number" name="age" placeholder="age" ></p>
+            <p><button type="submit">submit</button></p>
+        </form>
+    </body>
+</html>
+----
+
+* 호출결과
+** url에 form 정보가 노출되지 않습니다.
+
+[source,json]
+----
+{
+  "args": {}, 
+  "data": "", 
+  "files": {}, 
+  "form": {
+    "age": "30", 
+    "id": "marco", 
+    "no": "1"
+  }, 
+  "headers": {
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9", 
+    "Accept-Encoding": "gzip, deflate, br", 
+    "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7", 
+    "Cache-Control": "max-age=0", 
+    "Content-Length": "20", 
+    "Content-Type": "application/x-www-form-urlencoded", 
+    "Host": "httpbin.org", 
+    "Origin": "null", 
+    "Sec-Ch-Ua": "\"Google Chrome\";v=\"107\", \"Chromium\";v=\"107\", \"Not=A?Brand\";v=\"24\"", 
+    "Sec-Ch-Ua-Mobile": "?0", 
+    "Sec-Ch-Ua-Platform": "\"macOS\"", 
+    "Sec-Fetch-Dest": "document", 
+    "Sec-Fetch-Mode": "navigate", 
+    "Sec-Fetch-Site": "cross-site", 
+    "Sec-Fetch-User": "?1", 
+    "Upgrade-Insecure-Requests": "1", 
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36", 
+    "X-Amzn-Trace-Id": "Root=1-638553de-501147f16bd3dc8c0e0b452a"
+  }, 
+  "json": null, 
+  "origin": "58.239.124.18", 
+  "url": "https://httpbin.org/post"
+}
+----

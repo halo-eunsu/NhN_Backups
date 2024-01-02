@@ -1,0 +1,54 @@
+= fetch
+
+____
+
+Fetch API는 네트워크 통신을 포함한 리소스 취득을 위한 인터페이스가 정의되어 있습니다.
+XMLHttpRequest와 같은 비슷한 API가 존재합니다만, 새로운 Fetch API는 좀더 강력하고 유연한 조작이 가능합니다.
+
+____
+
+== 생성
+
+* url
+* options : method, header
+** option이 존재하지 않으면 GET으로 동작합니다.
+
+[source,js]
+----
+const promise = fetch(url, [options])
+
+----
+
+== 예외처리
+
+[source,js]
+----
+let response = await fetch(url);
+if (response.ok) { // if HTTP-status is 200-299
+  // get the response body (the method explained below)
+  let json = await response.json();
+} else {
+  alert("HTTP-Error: " + response.status);
+}
+
+----
+
+== 응답처리
+
+* response.text()
+* response.json()
+* response.formData()
+* response.blob()
+
+[source,js]
+----
+interface Body {
+    readonly body: ReadableStream<Uint8Array> | null;
+    readonly bodyUsed: boolean;
+    arrayBuffer(): Promise<ArrayBuffer>;
+    blob(): Promise<Blob>;
+    formData(): Promise<FormData>;
+    json(): Promise<any>;
+    text(): Promise<string>;
+}
+----

@@ -1,0 +1,57 @@
+= 변수
+
+* 변수는 하나의 값을 저장하기 위해 확보한 메모리 공간 자체 또는 그 메모리 공간을 식별하기 위해 붙인 이름을 말한다.
+* 자바스크립트는 개발자가 직접 메모리를 제어하지 못합니다.  즉 개발자가 직접 메모리 주소를 통해 값을 저장하고 참조할 필요가 없고 변수를 통해 안전하게 값에 접근이 가능합니다.
+* 변수에 값을 저장하는 것을 할당 이라 하며 변수에 저장된 값을 읽어 들이는 것을 참조라고 합니다.
+* 변수명을 자바스크립트 엔진에 알리는 것을 선언이라 합니다.
+
+== var
+
+* 변수의 중복선언 가능 ( 에러발생하지 않음)
+* 코드량이 많아 진다면 ?
+** *어디서 어떻게 사용 되는지 파악하기 힘듬, 디버깅 하기 힘듬*
+* https://jsfiddle.net/scormrte/gj0mvnku/2/
+
+[source,javascript]
+----
+var myName="nhn아카데미";
+console.log(myName);
+
+var myName="NHNAcademy";
+console.log(myName);
+
+----
+
+* var 관련 (MDN) - 반드시 볼것
+** https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Statements/var
+
+== const (Immutable )
+
+* 변수 재 선언이 되지 않음
+* 변수 재 할당 불가능 하지만 할당된 객체의 내용(프로퍼티의 추가,삭제,값의 변경)은 변경할 수 있습니다.
+* 반드시 선언과 초기화를 동시에 진행해야함
+
+== let ( mutable )
+
+* 변수 재 선언이 되지 않음
+* 변수 재 할당 가능
+
+== Scope
+
+* 블록 스코프
+
+[source,javascript]
+----
+let name = "global Name";
+{
+    let name="marco";
+    console.log(name);
+    language = "javascript";
+}
+
+console.log(name);
+age =4;
+var age;
+console.log(age);
+console.log(language);
+----

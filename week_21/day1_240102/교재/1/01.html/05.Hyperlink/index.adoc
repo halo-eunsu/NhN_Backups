@@ -1,0 +1,124 @@
+= Hyperlink
+
+* 웹이 제공하는 가장 흥미로운 혁신
+* HTML 파일, 텍스트 파일, 이미지, 문서, 비디오와 오디오 파일 등 웹 상에 존재할 수 있는 모든 것을 연결
+
+== a tag
+
+* 문법
+
+[source,html]
+----
+<a href="링크할 주소">텍스트 또는 이미지</a>
+
+----
+
+* 예제1
+
+[source,html]
+----
+<p>영화 데이터베이스</p>
+<p><a href="http://www.imdb.com">IMDB</a>로 연결</p>
+<p>영화 데이터베이스 <a href="http://www.imdb.com" title="세계에서 가장 큰 영화 데이터베이스">IMDB</a>로 연결
+</p>
+
+----
+
+image:./images/image1.png[image1.png]
+
+* 예제2
+** local에서 TheMartian.jpeg 참조해서 링크 걸기
+** 이미지 다운로드
+*** http://t1.daumcdn.net/movie/42d4e1f21810332ab6a86153005b30e8d902be21
+
+[source,html]
+----
+<a href="https://movie.daum.net/moviedb/main?movieId=94626"> <img src="./images/TheMartian.jpeg" /></a>
+----
+
+* 예제3
+** 원격지 이미지 참조해서 링크 걸기
+
+[source,html]
+----
+<a href="https://movie.daum.net/moviedb/main?movieId=94626"> <img src="http://t1.daumcdn.net/movie/42d4e1f21810332ab6a86153005b30e8d902be21" /></a>
+----
+
+== URL 과 Path
+
+* URL(Unified Resource Locator) : 웹 상의 어디에 위치하는지 결정하는 텍스트 문자열
+* Path은 내부 파일을 찾기 위해 Path 사용
+
+image:./images/image2.png[image2.png]
+
+* Path
+** 같은 디렉터리(폴더):파일의 이름만 지정
+** 하위 디렉터리 : 디렉터리 이름 + " / " + 파일 이름
+** 부모 디렉터리 : "../" + 파일 이름
+** 홈 디렉터리 : "~/" + 파일 이름
+
+== Document fragments
+
+* 같은 문서 내의 요소 위치로 이동
+* 링크할 요소에 id 속성을 삽입하고 태그로 연결
+* 특정 페이지의 특정 위치로 이동
+
+=== 예제
+
+* 예제를 실행할 때는 style tag는 &lt;head&gt;&lt;/head&gt;사이에 넣어주세요.
+
+[source,html]
+----
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      div{
+          border-width: 1px;
+          width: 200;
+          height: 200px;
+          font-size: 20pt;
+          vertical-align: baseline;
+          line-height: 200px;
+          text-align: center;
+      }
+
+      div#top_area{
+          background-color: burlywood;
+          margin-bottom: 2000px;
+      }
+
+      div#bottom_area{
+          background-color: royalblue;
+          color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="top_area" >
+      top area 
+      <a href="#bottom_area">bottom 이동</a>
+    </div>
+    <div id="bottom_area">
+      bottom area <a href="#top_area">top 이동</a>
+    </div>
+  </body>
+</html>
+----
+
+* bottom 이동, top 이동 버튼을 클릭하면 문서내의 해당 위치로 이동합니다. 직접 위 코드를 테스트 해보세요!
+
+image:./images/image3.png[image3.png]
+
+image:./images/image4.png[image4.png]
+
+== 이메일 링크
+
+* &lt;a mailto : "이메일 주소"&gt;&lt;/a&gt;
+
+[source,html]
+----
+<p>메일을 보내시려면 <a href="mailto:marco@nhnacademy.com">이쪽</a>으로 보내주세요</p>
+----
+
+image:./images/image5.png[image5.png]

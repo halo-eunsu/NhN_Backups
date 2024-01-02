@@ -1,0 +1,45 @@
+= z-index
+
+* z-index를 이용하여 요소의 순서 설정
+* 즉 어떤 Element가 가장 위로 올라갈 것인지 결정
+
+image:./images/img_0.png[img_0.png]
+
+[source,html]
+----
+<style>
+    .box{
+        width: 200px;
+        height: 50px;
+        position: absolute;
+        font-weight: bold;
+        font-size: 12pt;
+    }
+
+    .box2{
+        z-index:2;
+        top:150px;
+        left:100px;
+        background-color: #ccc;
+    }
+    .box3{
+        z-index:3;
+        top:180px;
+        left:140px;
+        background-color: skyblue;
+    }
+    .box4{
+        z-index:4;
+        top:170px;
+        left:280px;
+        background-color: red;
+    }
+
+</style>
+
+<div class="container">
+    <div class="box box2">z-index: 2</div>
+    <div class="box box3">z-index: 3</div>
+    <div class="box box4">z-index: 4</div>
+</div>
+----

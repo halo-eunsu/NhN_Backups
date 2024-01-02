@@ -1,0 +1,102 @@
+= Overflow
+
+* 자식 Element가 부모 Element를 넘어 갈 때  렌더링 방식
+
+== Overflow : visible;
+
+* 기본 속성
+image:./images/img_0.png[img_0.png]
+
+== Overflow : hidden;
+
+* hidden : 부모 Element를 넘어 가는 값을 잘라 냄
+
+image:./images/img_1.png[img_1.png]
+
+== Overflow : scroll;
+
+* scroll : 가로 세로 스크롤 바를 항상 보여줌
+
+image:./images/img_2.png[img_2.png]
+
+== Overflow : auto;
+
+* auto : 내용이 넘치는 경우에만 스크롤바를 보여줌
+
+== text-overflow : ellipsis;
+
+* 텍스트가 부모 요소를 벗어났을 때 말 줄임 표시를 위해 사용
+
+image:./images/img_3.png[img_3.png]
+
+[source,html]
+----
+<style>
+    .container{
+        padding:10px;
+        outline: solid black;
+        width: 100px;
+        height: 100px;
+    }
+    .box{
+        width: 80px;
+        height: 200px;
+    }
+
+    .container_visible{
+        overflow:visible;
+    }
+    .container_hidden{
+        overflow: hidden;
+    }
+
+    .container_scroll{
+       overflow: scroll;
+    }
+    .container_ellipsis{
+        width: 500px ;
+        height: 30px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+</style>
+
+<h1>Overflow:visible; default</h1>
+<div class="container container_visible">
+    <div class="box">
+        overflow CSS 단축 속성은 요소의 콘텐츠가 너무 커서 요소의 블록 서식 맥락에 맞출 수 없을 때의 처리법을 지정합니다. overflow-x, overflow-y
+    </div>
+</div>
+
+<hr style="margin-top:200px;" />
+
+<h1>Overflow:hidden;</h1>
+<h2>hidden -> 부모 Element를 넘어 가는 값을 잘라 냄</h2>
+<div class="container container_hidden ">
+    <div class="box">
+        overflow CSS 단축 속성은 요소의 콘텐츠가 너무 커서 요소의 블록 서식 맥락에 맞출 수 없을 때의 처리법을 지정합니다. overflow-x, overflow-y
+    </div>
+</div>
+
+<hr style="margin-top:100px;" />
+<h1>Overflow:scroll;</h1>
+<h2>scroll -> 가로 세로 스크롤 바를 항상 보여줌</h2>
+<div class="container container_scroll ">
+    <div class="box">
+        overflow CSS 단축 속성은 요소의 콘텐츠가 너무 커서 요소의 블록 서식 맥락에 맞출 수 없을 때의 처리법을 지정합니다. overflow-x, overflow-y
+    </div>
+</div>
+
+<hr style="margin-top:100px;" />
+<h1>Overflow:auto;</h1>
+<h2>auto -> 내용이 넘치는 경우에만 스크롤바를 보여 줌</h2>
+
+<hr style="margin-top:100px;" />
+<h1>text-overflow:ellipsis;</h1>
+<h2>텍스트가 부모 요소를 벗어났을 때 말 줄임 표시를 위해 사용</h2>
+
+<div class="container container_ellipsis ">
+    overflow CSS 단축 속성은 요소의 콘텐츠가 너무 커서 요소의 블록 서식 맥락에 맞출 수 없을 때의 처리법을 지정합니다. overflow-x, overflow-y
+</div>
+----

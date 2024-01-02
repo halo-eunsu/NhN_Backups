@@ -1,0 +1,128 @@
+= API 명세서
+
+== Server 정보
+
+=== URL : http://133.186.241.167:8100
+
+=== 인증은 header : X-USER-ID를 포함 합니다.
+
+== 로그인
+
+=== Request
+
+* **userId: nhnacademy**
+* **userPassword: 1234**
+** *아이디 패스워드는 고정입니다*
+
+[source,http request]
+----
+POST /api/users/login
+Content-Type: application/json
+
+{
+  "userId" : "nhnacademy",
+  "userPassword": "1234"
+}
+
+----
+
+==== Response
+
+[source,json]
+----
+{
+  "cartId": 1000,
+  "userId": "nhnacademy",
+  "userName": "아카데미"
+}
+
+----
+
+== 장바구니
+
+=== Request
+
+[source,http request]
+----
+GET /api/nhnmart/shopping-cart/{cart-id}
+Content-Type: application/json
+X-USER-ID: nhnacademy
+----
+
+=== Response
+
+[source,json]
+----
+[
+  {
+    "productId": "A0003",
+    "name": "양파",
+    "price": 1006,
+    "amount": 6,
+    "totalPrice": 6036
+  },
+  {
+    "productId": "A0001",
+    "name": "감자",
+    "price": 1006,
+    "amount": 5,
+    "totalPrice": 5030
+  },
+  {
+    "productId": "A0009",
+    "name": "수박",
+    "price": 1008,
+    "amount": 7,
+    "totalPrice": 7056
+  },
+  {
+    "productId": "A0008",
+    "name": "귤",
+    "price": 1003,
+    "amount": 8,
+    "totalPrice": 8024
+  },
+  {
+    "productId": "A0006",
+    "name": "대파",
+    "price": 1007,
+    "amount": 1,
+    "totalPrice": 1007
+  },
+  {
+    "productId": "A0007",
+    "name": "사과",
+    "price": 1009,
+    "amount": 9,
+    "totalPrice": 9081
+  },
+  {
+    "productId": "A00010",
+    "name": "라면",
+    "price": 1001,
+    "amount": 4,
+    "totalPrice": 4004
+  },
+  {
+    "productId": "A0002",
+    "name": "오이",
+    "price": 1008,
+    "amount": 1,
+    "totalPrice": 1008
+  },
+  {
+    "productId": "A0004",
+    "name": "우유",
+    "price": 1006,
+    "amount": 2,
+    "totalPrice": 2012
+  },
+  {
+    "productId": "A0005",
+    "name": "계란",
+    "price": 1007,
+    "amount": 9,
+    "totalPrice": 9063
+  }
+]
+----
