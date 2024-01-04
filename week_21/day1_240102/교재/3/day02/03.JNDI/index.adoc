@@ -1,0 +1,92 @@
+= JNDI
+
+== JNDI란?
+* Java Naming and Directory Interface
+
+____
+JNDI는 다른 종류의 이름 지정 및 디렉토리 서비스에 액세스하는 데 필요한 API(Application Programming Interface)입니다. J2EE 구성 요소는 JNDI 조회 메소드를 호출하여 객체를 찾습니다.
+응용 프로그램은 이 API를 호출하여 자원과 다른 프로그램 객체를 찾습니다. 자원은 데이터베이스 서버나 메시징 시스템 같은 시스템과의 연결을 제공하는 프로그램 객체입니다. (JDBC 자원을 데이터 소스라고도 합니다.) 모든 자원 객체는 고유하고 사용자에게 친숙한 JNDI 이름으로 식별됩니다. 자원 객체와 JNDI 이름은 Application Server에 포함된 이름 지정 및 디렉토리 서비스에 의해 함께 바인딩됩니다. 자원을 새로 만들려면 새로운 이름 객체 바인딩을 JNDI에 입력합니다.
+____
+
+==  JNDI DataSource 가져오기
+* Web Application 서버에 설정된 데이터 소스를 InitialContext.lookup(..) 메소드로 가져올 수 있습니다.
+
+[source,java]
+----
+InitialContext initialContext = new InitialContext();
+DataSource dataSource = (DataSource)initialContext.lookup("java:comp/env/jdbc/test");
+----
+
+== Tomcat 설치
+* https://tomcat.apache.org/download-90.cgi
+
+== Tomcat JNDI 설정
+* 다음과 같이 Resource 엘리먼트에 DataSource 를 등록합니다.
+
+[source,xml]
+----
+<Context>
+
+    <!-- Default set of monitored resources. If one of these changes, the    -->
+    <!-- web application will be reloaded.                                   -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+    <Resource name="jdbc/test" auth="Container" type="javax.sql.DataSource"
+              maxTotal="5" maxIdle="5" maxWaitMillis="10000"
+              username="nhn_academy_0" password="1234"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/nhn_academy_0"
+              closeMethod="close" />
+
+</Context>
+----
+
+== JDBC 드라이버 설치
+* JDBC 드라이버 파일을 아래 위치에 복사합니다.
+** https://mvnrepository.com/artifact/com.mysql/mysql-connector-j/8.2.0[maven repository]
+** https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.2.0/mysql-connector-j-8.2.0.jar[mysql-connector-j-8.2.0.jar]
+
+----
+${톰캣설치디렉토리}/lib/
+----
+
+== Servlet 개발
+
+[source,java]
+----
+@WebServlet(urlPatterns = "/jdbc", name = "jdbcConnectionServlet")
+public class JdbcConnectionServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("text/html;charset=UTF-8");
+        DataSource dataSource = getDataSource();
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+
+            ResultSet resultSet = statement.executeQuery("select * from Students");
+            while (resultSet.next()) {
+                resp.getWriter().println("==>" + resultSet.getInt(1));
+                resp.getWriter().println("==>" + resultSet.getString(2));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        resp.flushBuffer();
+    }
+
+    private DataSource getDataSource() {
+        try {
+            InitialContext initialContext = new InitialContext();
+            return (DataSource) initialContext.lookup("java:comp/env/jdbc/test");
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+----
+
+== Reference
+* https://docs.oracle.com/cd/E19823-01/819-1552/jndi.html[Oracle - JNDI 자원]
+* https://tomcat.apache.org/tomcat-9.0-doc/jndi-datasource-examples-howto.html[Tomcat9 - JNDI Datasource How-To]

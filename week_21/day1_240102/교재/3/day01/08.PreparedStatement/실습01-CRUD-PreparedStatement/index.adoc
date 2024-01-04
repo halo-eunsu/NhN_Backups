@@ -1,0 +1,22 @@
+= Student CRUD
+
+* PreparedStatement를 사용한 CRUD 실습
+
+== branch
+* 실습 : https://github.com/nhnacademy-bootcamp/jdbc-exercise/tree/exercise-student-crud-preparedstatement[exercise-student-crud-preparedstatement, target=window]
+
+* 확인 : https://github.com/nhnacademy-bootcamp/jdbc-exercise/tree/student-crud[student-crud, target=window]
+
+== 실습- PreparedStatementStudentRepository.java
+
+[source,java]
+----
+public class PreparedStatementStudentRepository implements StudentRepository {
+    //todo PreparedStatement를 이용한 student crud 구현
+}
+----
+
+
+== Test Code
+
+* Test Code가 통과하도록 구현합니다.

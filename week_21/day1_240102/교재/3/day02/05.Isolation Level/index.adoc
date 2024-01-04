@@ -1,0 +1,75 @@
+= Isolation Level - 트랜잭션의 격리 수준
+
+* 동시에 여러 트랜잭션이 처리될 때 특정 트랜잭션이 다른 트랜잭션에서 변경하거나 조회하는 데이터를 볼 수 있도록 허용할지 말지를 결정하는 것입니다.
+
+== Branch
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/tree/transaction-bacnk-account[transaction-bacnk-account] 예제를 참고합니다.
+
+== Transaction 격리 수준에 따라 발생할 수 있는 문제점
+
+* DIRTY READ
+** 트랜잭션이 작업이 완료되지 않았는데도 다른 트랜잭션에서 볼 수 있게 되는 현상
+
+* Non-Repeatable Read
+** 같은 Transaction 내에서 같은 데이터를 여러 번 조회했을 때 읽어온 데이터가 다른 경우
+
+* PHANTOM READ
+** 다른 트랜잭션에서 수행한 변경 작업에 의해 레코드가 보였다가 안 보였다가 하는 현상
+
+== READ UNCOMMITTED ( 격리 수준 : 가장 낮음 )
+* 각 트랜잭션에서의 변경 내용이 COMMIT이나 ROLLBACK 여부에 상관없이 다른 트랜잭션에서 값을 읽을 수 있습니다.
+* 정합성에 문제가 많은 격리 수준이기 때문에 사용하지 않는 것을 권장합니다.
+* Commit이 되지 않는 상태지만 Update 된 값을 다른 트랜잭션에서 읽을 수 있습니다. (DIRTY READ 발생)
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/blob/transaction-bacnk-account/src/main/java/com/nhnacademy/jdbc/simulation/isolation/ReadUnCommittedMain.java[ReadUnCommittedMain.java]  예제를 참고합니다.
+
+== READ COMMITTED
+* RDB에서 대부분 기본적으로 사용되고 있는 격리 수준이다.
+* DIRTY READ와 같은 현상은 발생하지 않는다.
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/blob/transaction-bacnk-account/src/main/java/com/nhnacademy/jdbc/simulation/isolation/ReadCommittedMain.java[ReadCommittedMain.java] 예제를 참고합니다.
+
+== REPEATABLE READ
+* 트랜잭션마다 트랜잭션 ID를 부여하여 트랜잭션 ID보다 작은 트랜잭션 번호에서 변경한 것만 읽게 합니다.
+* Undo 공간에 백업해 두고 실제 레코드 값을 변경합니다.
+* 이러한 변경방식은 MVCC(Multi Version Concurrency Control)라고 부릅니다.
+
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/blob/transaction-bacnk-account/src/main/java/com/nhnacademy/jdbc/simulation/isolation/RepeatableReadEx1Main.java[RepeatableReadEx1Main.java]  예제를 참고합니다.
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/blob/transaction-bacnk-account/src/main/java/com/nhnacademy/jdbc/simulation/isolation/RepeatableReadEx2Main.java[RepeatableReadEx2Main.java]  예제를 참고합니다.
+
+== SERIALIZABLE ( 격리 수준 : 가장 높음 )
+* 가장 단순한 격리 수준이지만 가장 엄격한 격리 수준입니다.
+* 성능 측면에서는 동시 처리성능이 가장 낮습니다.
+* SERIALIZABLE에서는 PHANTOM READ가 발생하지 않습니다.
+* 실무에서는 거의 사용되지 않는다.
+
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/blob/transaction-bacnk-account/src/main/java/com/nhnacademy/jdbc/simulation/isolation/SerializableMain.java[SerializableMain.java]  예제를 참고합니다.
+
+____
+격리 수준이 낮아지면 동시 처리 성능은 높아짐. 반대로 격리 수준이 높아지면 동시 처리 성능은 낮아짐 즉 데이터 정합성과 성능은 반비례합니다.
+____
+
+== MySql, Innodb engine (Transaction 지원)
+* Default Isolation Level
+**  *REPEATABLE READ*
+
+== JDBC Isolation Level 설정
+
+* java.sql.Connection
+
+----
+int TRANSACTION_NONE             = 0; // transaction 지원 안 함
+int TRANSACTION_READ_UNCOMMITTED = 1;
+int TRANSACTION_READ_COMMITTED   = 2;
+int TRANSACTION_REPEATABLE_READ  = 4;
+----
+
+** Isolation Level 변경
+
+[source,java]
+----
+connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+----
+
+== Reference
+* https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-isolation-levels.html[innodb-transaction-isolation-levels]
+* https://docs.oracle.com/cd/E19501-01/819-3659/beamv/index.html
+* https://decentro.tech/blog/decoding-isolation-levels-in-mysql/

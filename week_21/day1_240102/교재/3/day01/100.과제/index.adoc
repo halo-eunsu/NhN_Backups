@@ -1,0 +1,5 @@
+= 과재
+== student-step4 , servlet/jsp 예제를 기반으로 StudentRepository를 jdbc를 이용해서 구현하세요.
+
+== Reference
+* https://github.com/nhnacademy-bootcamp/java-servlet-jsp/tree/main/day04

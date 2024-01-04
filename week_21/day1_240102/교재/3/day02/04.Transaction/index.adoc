@@ -1,0 +1,107 @@
+= Transaction
+
+* 트랜잭션(Transaction)은 데이터베이스의 상태를 변환시키는 `하나의 논리적 기능을 수행하기 위한 작업의 단위` 또는 `한꺼번에 모두 수행되어야 할 일련의 연산` 들을 의미합니다.
+
+== Branch
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/tree/transaction-bacnk-account[transaction-bacnk-account] 예제를 참고합니다.
+
+== Transaction
+* 트랜잭션을 설명할 때, 가장 많이 등장하는 예시는 은행계좌송금 작업입니다.
+* 사용자 A가 사용자 B에게 10,000원을 송금할 경우를 생각해 봅시다.
+* 현실에서는 물리적인 지폐가 이동하면 끝나지만, 데이터베이스의 세계에서는 각각의 상태를 변경해줘야 합니다.
+* 10,000이라는 데이터가 실제로 이동하는게 아니라, 사용자 A의 데이터와 사용자 B의 데이터 상태가 각각 바뀌는 것이죠. 따라서 두 번의 update 쿼리를 실행해야 합니다. 다음은 예시에 대한 트랜잭션의 작업 절차입니다.
+
+==== Transaction 수행과정
+* A계좌에서 B계좌로 10,000 이체되는 과정은 다음과 같습니다.
+. 데이터베이스에서 A의 은행계좌잔고 값을 메인 메모리로 읽어옵니다.
+. 읽어온 A의 잔고 값에서 10,000을 감소시킵니다.
+. 데이터베이스에서 B의 은행계좌잔고 값을 메인 메모리로 읽어옵니다.
+. 읽어온 B의 잔고 값을 10,000 증가시킵니다.
+. A의 계좌 값을 데이터베이스에 기록합니다.
+. B의 계좌 값을 데이터베이스에 기록합니다.
+
+== Transaction 속성
+* 트랜잭션은 `작업의 안전성` 과 `데이터의 무결성` 을 유지시키기 위해 다음의 4가지 성질을 가지고 있습니다.
+
+** `Atomicity` *(원자성)*
+** `Consistency` *(일관성)*
+** `Isolation` *(고립성)*
+** `Durability` *(지속성)*
+
+=== Atomicity(원자성)
+* 트랜잭션의 수행결과는 데이터베이스에 전부 반영되거나, 전부 반영되지 않아야 합니다.(All or Nothing)
+* Transaction 수행과정 중 A의 계좌값을 감소했는데 이후에 에러가 발생한다면 A 의 돈은 사라지고 B는 돈을 받을 수 없게 됩니다.
+* 이렇게 트랜젝션 작업 중 문제가 생기면 전체 `*작업을 취소(ROLLBACK)*` 하는 과정을 거쳐야 합니다.
+
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/blob/transaction-bacnk-account/src/main/java/com/nhnacademy/jdbc/simulation/AtomicMain.java[AtomicMain.java] 예제를 참고합니다.
+
+=== Consistency(일관성)
+* 트랜잭션 수행 후 데이터 모델의 모든 제약조건을 만족해야 합니다.
+* 해당 컬럼이나 레코드에 명시된 제약조건, 예를 들어 잔고의 데이터 타입은 정수형이어야 한다, 혹은 잔고의 값은 null 이면 안된다, 혹은 잔고가 늘어나면 신용평가 값도 변경되어야 한다 등 기본 키와 외래키, 속성에 대한 제약조건과 같은 `*명시적 무결성 제약 조건*` 을 만족시켜야 합니다.
+
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/blob/transaction-bacnk-account/src/main/java/com/nhnacademy/jdbc/simulation/ConsistencyMain.java[ConsistencyMain.java] 예제를 참고합니다.
+
+
+==== Isolation(고립성)
+* 트랜잭션 수행 시 다른 트랜잭션이 영향을 미치지 않아야 합니다.
+* A의 잔고가 100,000원이 있다고 가정합시다.
+* A는 B에게 10,000원을 송금하는 동시에 100,000원을 인출하려 한다고 가정합시다.
+* 이 경우 송금 트랜잭션과 인출 트랜잭션이 동시에 수행됩니다.
+* 앞서 설명한 것처럼 A가 B에게 송금할 경우 A의 잔고에서 10,000원이 차감됩니다. 따라서 A의 잔고는 90,000원이 되어 100,000원을 인출하지 못해야 정상입니다.
+
+* 그런데 만약 송금 트랜잭션 중간에 인출 트랜잭션이 끼어들게 되면 어떻게 될까요? 송금 트랜잭션이 디스크에서 100,000원을 메모리에 적재해 90,000원으로 값을 변경해 다시 DB에 저장하기 전에, 인출 트랜잭션이 A의 잔고에 접근해 작업을 마무리한다고 가정해봅시다.
+* 이렇게 되면 송금 트랜잭션이 뒤늦게 DB에 90,000원을 저장하기 때문에 송금과 인출을 마치고도 A의 잔고에는 90,000원이 들어있을 겁니다.
+
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise/blob/transaction-bacnk-account/src/main/java/com/nhnacademy/jdbc/simulation/IsolationMain.java[IsolationMain.java] 예제를 참고합니다.
+
+=== Durability(영속성)
+* 트랜잭션의 성공결과는 장애 발생 후에도 변함없이 보관되어야 합니다.
+* 트랜잭션이 작업을 정상적으로 완료한 경우에는 디스크(데이터베이스)에 확실히 기록하여야 하며, 부분적으로 수행된 경우에는 작업을 취소하여야 합니다.
+* 즉, 정상적으로 완료 혹은 부분완료된 데이터는 DBMS가 책임지고 데이터베이스에 기록하는 성질을 트랜잭션의 Durability(영속성)이라고 합니다.
+
+== JDBC Commit & Rollback
+* commit() : Transaction의 commit을 수행합니다.
+** setAutoCommit(boolean autoCommit) : 기본값은 true , 즉 별도로 설정해주지 않는다면 자동 commit 합니다.
+* rollback() : Transaction의 rollback을 수행합니다.
+
+=== Transaction처리를 위해서
+* setAutoCommit(false)로 설정합니다.
+**  즉 manual하게 commit할 수 있습니다.
+** 아래 코드는 https://github.com/nhnacademy-bootcamp/jdbc-exercise/blob/transaction-bacnk-account/src/main/java/com/nhnacademy/jdbc/simulation/AtomicMain.java[AtomicMain.java] 예제 입니다.
+
+[source,java]
+----
+@Slf4j
+public class AtomicMain {
+
+    public static void main(String[] args) throws SQLException {
+        BankService bankService = new BankServiceImpl(new AccountRepositoryImpl());
+
+        Connection connection = DbUtils.getDataSource().getConnection();
+        //auto commit을 false로 설정
+        connection.setAutoCommit(false);
+
+        //todo1 - 계좌생성 : 8000
+        bankService.createAccount(connection,new Account(8000l,"nhn아카데미-8000",10_0000l ));
+
+        try{
+            //todo2 - 8000계좌에서 -> 5_0000인출
+            bankService.withdrawAccount(connection,8000l,5_0000);
+
+            //todo3 - 9000 계좌에 -> 5_0000입급
+            bankService.depositAccount(connection,9000l,5_0000);
+            //9000 계좌는 존재하지 않음으로 AccountNotFoundException 예외발생
+
+            //예외가 발생하지 않는다면 commit 처리 합니다.
+            connection.commit();
+        }catch (Exception e){
+            log.debug("withdraw:{}",e.getMessage());
+            //todo4 - 예외가 발생하면 rollback 처리 합니다.
+            connection.rollback();
+        }
+
+        connection.close();
+    }
+
+}
+----

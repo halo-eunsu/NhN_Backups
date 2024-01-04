@@ -1,0 +1,40 @@
+= Bank Account
+
+* Bank Account 구현합니다.
+* *실습은 todo#1 부터 순서대로 진행합니다.*
+
+== Branch
+* 실습 : https://github.com/nhnacademy-bootcamp/jdbc-exercise/tree/transaction-bacnk-account[transaction-bacnk-account]
+* 확인 : https://github.com/nhnacademy-bootcamp/jdbc-exercise/tree/exercise-transaction-bacnk-account[exercise-transaction-bacnk-account]
+
+
+== 프로젝트 구성
+
+* BankService 테스트를 위해서 `Mockito` 추가 되었습니다.
+** https://site.mockito.org/
+
+[source,xml]
+----
+ <dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-junit-jupiter</artifactId>
+    <version>5.6.0</version>
+    <scope>test</scope>
+</dependency>
+----
+
+== jdbc_account
+* 아래 script를 이용해서 jdbc_account table을 생성합니다.
+
+[source,sql]
+----
+CREATE TABLE `jdbc_account` (
+  `account_number` bigint unsigned NOT NULL COMMENT '계좌번호',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '고객_이름',
+  `balance` bigint DEFAULT '0' COMMENT '잔고',
+  PRIMARY KEY (`account_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+----
+
+== Test Code
+* Test Code가 통과할 수 있도록 구현합니다.

@@ -1,0 +1,107 @@
+= Sql Injection
+
+== branch
+* 실습 : https://github.com/nhnacademy-bootcamp/jdbc-exercise/tree/exercise-login-sql-injection[exercise-login-sql-injection]
+* 확인 : https://github.com/nhnacademy-bootcamp/jdbc-exercise/tree/login-sql-injection[login-sql-injection]
+
+== table : jdbc_users
+* jdbc_users table을 생성합니다.
+
+[source,sql]
+----
+CREATE TABLE `jdbc_users` (
+  `user_id` varchar(50) NOT NULL,
+  `user_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `user_password` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  PRIMARY KEY (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+----
+
+== User.java
+
+[source,java]
+----
+public class User {
+    private String userId;
+    private String userName;
+    private String userPassword;
+}
+----
+
+== UserRepository
+
+[source,java]
+----
+public interface UserRepository {
+    Optional<User> findByUserIdAndUserPassword(String userId, String userPassword);
+    Optional<User> findById(String userId);
+    int save(User user);
+    int updateUserPasswordByUserId(String userId, String userPassword);
+    int deleteByUserId(String userId);
+}
+----
+
+== StatementUserRepository.java
+
+[source,java]
+----
+public class StatementUserRepository implements UserRepository {
+    //todo 구현
+}
+----
+
+== PreparedStatementUserRepository.java
+
+[source,java]
+----
+public class PreparedStatementUserRepository implements UserRepository {
+    //todo 구현
+}
+----
+
+== Test Code
+* Test Code가 통과할 수 있도록 구현합니다.
+
+== SQL Injection
+
+* 로그인 : `Id` 와 `Password` 가 일치하는 회원 조회
+
+[source,java]
+----
+@Test
+@Order(2)
+@DisplayName("login - sql injection")
+void findByUserIdAndUserPAssword_sql_injection(){
+    String id="user1";
+    String password="' or '1'='1";
+
+    Optional<User> userOptional = userRepository.findByUserIdAndUserPassword(id,password);
+
+    log.debug("userId:{}",userOptional.get().getUserId());
+    log.debug("userName:{}",userOptional.get().getUserName());
+    log.debug("userPassword:{}",userOptional.get().getUserPassword());
+
+    Assertions.assertTrue(userOptional.isPresent());
+}
+----
+
+=== Statement
+
+* Statement를 사용하여 `password`를 `parameter`로 전달하면 다음과 같이 sql이 작성됩니다.
+** password paramter가 *문자열로 인식됩니다.*
+
+[console,sql]
+----
+select user_id, user_name, user_password from jdbc_users where user_id='user1' and user_password='' or '1'='1'
+----
+
+=== PreparedStatement
+
+* `password`를 `parameter`로 전달하면 다음과 같이 sql이 작성됩니다.
+** user_password 의 parameter로 전달 됨니다.
+** *이러한 이유로 PreparedStatement를 사용합니다.*
+
+[console,sql]
+----
+select user_id, user_name, user_password from jdbc_users where user_id='user1' and user_password='\' or \'1\'=\'1'
+----

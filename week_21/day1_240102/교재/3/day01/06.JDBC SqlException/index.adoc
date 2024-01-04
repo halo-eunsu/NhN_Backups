@@ -1,0 +1,66 @@
+= JDBC SQL Exception (예외 처리)
+
+== branch
+** *connection-driver-manager*
+
+
+== SQL Exception
+* JDBC에서 쿼리를 실행하거나 생성할 때 예외가 발생할 수 있습니다.
+* 데이터베이스 또는 드라이버로 인해 발생하는 예외는 SQL 예외에 속합니다.
+* 예외 처리를 사용하면 일반적인 예외를 처리하는 것처럼 SQL 예외를 처리할 수 있습니다.
+* `SQLException` 은 java.sql 패키지에서 사용할 수 있습니다.
+
+
+== SQLException.class
+
+|===
+|메소드 이름| 기능
+|getErrorCode()
+|오류 번호를 반환합니다.
+
+|getMessage()
+|오류 메시지를 반환합니다.
+
+|getSQLState()
+|`SQLException` 개체의 `SQLState` 를 반환합니다. null도 반환할 수 있습니다. 데이터베이스 오류의 경우 XOPEN SQL State를 반환합니다.
+
+|===
+
+=== Insert, throw SQLException.
+
+[source,java]
+----
+@Slf4j
+public class JdbcExceptionTest {
+    static Connection connection;
+    @BeforeAll
+    static void setUp(){
+        connection = DbUtils.getConnection();
+    }
+
+    @Test
+    @DisplayName("sqlExceptionTest")
+    void insert_trhow_sqlException(){
+
+        String sql = "insert into jdbc_students (student_id,student_name,gender,age) values(100,'마르코','M','39')";
+
+        SQLException sqlException = Assertions.assertThrows(SQLException.class,()->{
+            Statement statement = connection.createStatement();
+            statement.execute(sql);
+        });
+
+        log.info("errorCode:{}",sqlException.getErrorCode());
+        log.info("message:{}",sqlException.getMessage());
+        log.info("sqlState:{}",sqlException.getSQLState());
+    }
+
+    @AfterAll
+    static void release(){
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+----
