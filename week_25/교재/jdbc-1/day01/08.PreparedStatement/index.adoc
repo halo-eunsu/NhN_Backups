@@ -1,0 +1,23 @@
+= PreparedStatement
+
+* Precompile(미리 준비된, 미리 컴파일된) SQL을 보내고 싶다면 `PreparedStatement` 를 사용할 수 있습니다.
+
+____
+* prepared statement or parameterized statement는 데이터베이스 관리 시스템(DBMS)에서 동일하거나 비슷한 데이터베이스 문을 높은 효율성으로 반복적으로 실행하기 위해 사용되는 기능이다.
+* 일반적으로 쿼리나 업데이트와 같은 SQL 문과 함께 사용되는 `PreparedStatement` 는 템플릿의 형태를 취하며, 그 템플릿 안으로 특정한 상숫값이 실행 때마다 대체된다.
+____
+
+== PreparedStatement vs Statement
+
+* Statement – Used to execute `String-based SQL queries`
+* PreparedStatement – Used to execute `Parameterized SQL queries`
+
+=== 특징
+
+* `PreparedStatement` 를 사용하면 데이터베이스에서 cache를 조회하여 이전에 Pre-compilation 된 쿼리를 사용합니다.
+* `SQL Injection` 을 방어합니다.
+* 배치 실행을 지원합니다.
+
+== Reference
+* https://en.wikipedia.org/wiki/Prepared_statement[wiki,PreparedStatenent]
+* https://sechow.com/bricks/docs/login-1.html[Bricks, Login]

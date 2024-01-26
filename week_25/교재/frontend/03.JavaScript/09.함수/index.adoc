@@ -1,0 +1,81 @@
+= 함수 (function)
+
+* 함수는 작업을 수행하거나 값을 계산하는 문장 집합 같은 자바스크립트 절차입니다.
+* 함수를 사용하려면 함수를 호출하고자 하는 범위 내에서 함수를 정의 해야만 합니다.
+
+== 기명함수
+
+* 이름이 있는 함수
+* *기명함수는 호이스팅의 영향을 받음*
+* *브라우저가 런타임 이전에 선언 및 할당되는 함수*
+
+[source,javascript]
+----
+console.log( square(4) );
+
+function square(number) {
+ return number * number;
+}
+
+----
+
+## 익명 함수
+* 이름이 없는 함수
+* **익명함수는 호이스팅의 영향을 받지 않음**
+* **브라우저가 런터입에 할됭되는 함수**
+
+[source,javascript]
+----
+let square = function(number) { return number * number };
+let x = square(4) // x 의 값은 16 입니다.
+console.log(x);
+----
+
+## 즉시실행 함수
+
+[source,javascript]
+----
+(function(number=4){
+ return number * number;
+})();
+
+----
+
+## 함수 특징
+* 함수를 다른 함수에 인수로 제공합니다.
+
+[source,javascript]
+----
+function sayHello() {
+ return "Hello, ";
+}
+function greeting(helloMessage, name) {
+ console.log(helloMessage() + name);
+}
+// `sayHello`를 `greeting` 함수에 인자로 전달
+greeting(sayHello, "JavaScript!");
+
+----
+
+* 함수가 함수를 반환할 수 있습니다.
+
+[source,javascript]
+----
+function sayHello() {
+ return function() {
+ console.log("Hello!");
+ }
+}
+
+----
+
+* 변수에 함수를 할당할 수 있습니다.
+
+[source,javascript]
+----
+const foo = function() {
+ console.log("foobar");
+}
+// 변수를 사용해 호출
+foo();
+```

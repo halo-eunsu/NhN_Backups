@@ -1,0 +1,148 @@
+= Apache Commons DBCP(DataBase Connection Pool)
+
+* `DBCP2` 는 https://commons.apache.org/proper/commons-pool/[Apache Commons Pool] 기반으로 합니다.
+* DBCP 1.x에 비해서 성능이 향상되었습니다.
+
+== 환경
+* DBCP 2.5.x : java 8 이상
+* DBCP 2.4.x : java 7 이상
+
+|===
+|Commons DBCP Version| JDK Version|JDBC Version
+|*2.5.x*
+|*8*
+|*4.2*
+
+|2.4.x
+|7
+|4.1
+
+|1.4.x
+|6
+|4
+
+|1.3.x
+|1.4~1.5
+|3
+
+|===
+
+== Maven
+* https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
+
+[,xml]
+----
+<dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-dbcp2</artifactId>
+    <version>2.11.0</version>
+</dependency>
+----
+
+== BasicDataSource
+
+* javax.sql.DataSource의 기본 구현
+* 기본 요구사항에 대한 oen-stop 솔루션을 제공한다.
+
+____
+Basic implementation of javax.sql.DataSource that is configured via JavaBeans properties.
+This is not the only way to combine the commons-dbcp2 and commons-pool2 packages, but provides a one-stop solution for basic requirements.
+____
+
+== BasicDataSource Configuration Parameters
+
+* 각각의 parameter에 해당하는 setter 메서드로 설정할 수 있습니다.
+
+|===
+|Parameter|Default|Description
+
+|initialSize
+|0
+|최초 connection pool 시작될 때 초기 Connection 개수
+
+|maxTotal
+|8
+|최대로 사용할 수 있는 Connection 개수
+
+|maxIdle
+|8
+|Connection pool에 반납할 때 최대 유지될 수 있는 Connection 수
+
+|minIdle
+|0
+|최소한으로 유지될 Connection 수
+
+|maxWaitMillis
+|indefinitely
+|풀이 예외를 발생시키기 전에 연결이 반환될 때까지 대기하는 시간(밀리초 단위)
+
+|validationQuery
+|
+|Connection pool에 Connection을 반환하기 전에 해당 풀의 연결여부를 확인 +
+`mysql` : `select 1` +
+`oracle` : `select 1 from dual`
+
+|testOnBorrow
+|true
+|pool에서 Connection을 사용하기 위해서(Connction pool에서 Connection 얻어올 때) 유효성 검사 여부
+
+|testOnReturn
+|false
+|Connection을 pool에 반환할 때 유효성 검사 여부
+
+|maxConnLifetimeMillis
+|-1 (무한대)
+|커넥션의 최대 라이프타임을 지정
+
+|lifo
+|true
+|최근에 반환한 Connection을 가장 우선 대여해 줍니다.
+
+|===
+
+== PoolableConnection
+* close() 호출하면 Connection을 Close 하는 대신 자신을 반환합니다.
+** Connection Pool에 등록
+
+[source,java]
+----
+connection.close() -> PoolableConnection.close()
+----
+
+____
+A delegating connection that, rather than closing the underlying connection, returns itself to an ObjectPool when closed.
+____
+
+== 최적화
+
+* 1 Request -> 1 Thread 처리
+* 100 Request -> 100 Thread 처리
+* 1000 Request -> 1000 Thread 처리?
+* 10000 Request -> 10000 Thread 처리?
+
+=== WAS == Tomcat 은 Thread Pool을 사용
+* Default = 200개
+** 즉 tomcat 기본설정을 사용한다면 동시에 최대 200개까지 처리할 수 있음
+** DBCP parameter를 WAS의 Thread Pool Size로 고정하여 최적화.
+
+[source,java]
+----
+    BasicDataSource basicDataSource = new BasicDataSource();
+    basicDataSource.setUrl("jdbc:mysql://133.186.241.167:3306/nhn_academy_100");
+    basicDataSource.setUsername("nhn_academy_100");
+    basicDataSource.setPassword("1jaOTakgkS1$dWl2");
+    basicDataSource.setInitialSize(200);
+    basicDataSource.setMaxTotal(200);
+    basicDataSource.setMaxIdle(200);
+    basicDataSource.setMinIdle(200);
+
+    basicDataSource.setMaxWait(Duration.ofSeconds(2));
+    basicDataSource.setValidationQuery("select 1");
+    basicDataSource.setTestOnBorrow(true);
+----
+
+== Reference
+* https://commons.apache.org/proper/commons-pool/[apache-commons-pool]
+* https://commons.apache.org/proper/commons-dbcp/apidocs/index.html[Javadoc API documents]
+* https://commons.apache.org/proper/commons-dbcp/configuration.html[BasicDataSource Configuration Parameters]
+* https://commons.apache.org/proper/commons-dbcp/apidocs/org/apache/commons/dbcp2/PoolableConnection.html[dbcp2, PoolableConnection]

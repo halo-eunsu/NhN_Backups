@@ -1,0 +1,28 @@
+= 호이스팅
+
+* *선언된 함수나 변수의 선언문을 유효 범위의 최상단으로 끌어올리는 행위*
+
+[source,javascript]
+----
+//변수
+console.log(redColor);
+
+//변수에 함수를 할당
+console.log(blueColor());
+
+//function
+console.log(greenColor());
+
+// var 호이스팅 영향받음
+var redColor="red";
+
+//이름이 없는 함수 ( 호이스팅 영향 안 받음)
+var blueColor=function(){
+    return "blue";
+}
+
+//이름이 있는 함수 (호이스팅 영향 받음)
+function greenColor(){
+    return "green";
+}
+----

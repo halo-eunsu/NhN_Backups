@@ -1,0 +1,170 @@
+= Promise
+
+== callback hell
+
+[source,js]
+----
+ // 로그인 시도
+ doLogin(userId, userPassword, function(user){
+    // ... 
+    // 카트조회
+    getCartItems(user.userId, user.cartId, function(items){
+        /// ...
+
+        //카트조회후 처리해야될 새로운 요구사항이 추가된다면?
+        doSomething(function(){
+            // ... 
+        })
+    });
+    // ...
+});
+
+----
+
+== 깔끔하지 못한 Error 처리
+
+* error는 로그인 요청이 끝난 시점에 처리가됨..
+* try - catch를 이용해서 error을 핸들링 할 수 없음.
+
+[source,js]
+----
+xhr.addEventListener("load", function(){
+    if(this.status==200){
+        console.log(this.response);
+        const items = this.response;
+        //TODO#12 cart-api가 정상적으로 호출되면
+        //parameter로 전달받은 displayCartIitems() 함수 호출
+        displayCartItems(items);
+    }else{
+        console.log(this.response);
+        alert("cart-api error");
+        throw new Error(this.response);
+    }
+});
+----
+
+* *try-catch 사용할 수 없음*
+
+[source,js]
+----
+try{
+     // 로그인 시도
+     doLogin(userId, userPassword, function(user){
+        // ... 
+       // 카트조회
+        getCartItems(user.userId, user.cartId, function(items){
+            /// ...
+
+            //카트조회후 처리해야될 새로운 요구사항이 추가된다면?
+            doSomething(function(){
+                // ... 
+            })
+        });
+        // ...
+     });
+}catch{
+    alert("error <-- 에러를 잡을 수 없음");
+}
+----
+
+* *조금더 단순한 예제*
+
+[source,js]
+----
+try {
+
+    setTimeout(() => { 
+        throw new Error('error'); 
+    }, 1000);
+
+} catch (e) {
+    alert("error <-- 에러를 잡을 수 없음")
+    console.log(e);
+}
+----
+
+=== 아래 자바 코드처럼 동작하도록 변경하면.. ?
+
+[source,java]
+----
+public class ErrorTest {
+    public static void main(String[] args) {
+        try{
+            Api.doLogin();
+        }catch (Exception e){
+            //error 대응
+            e.printStackTrace();
+        }
+    }
+
+    static class Api{
+        public static void doLogin(){
+            throw new UnauthorizedException();
+        }
+    }
+
+    static class UnauthorizedException  extends RuntimeException{
+        public UnauthorizedException(){
+            super("Unauthorized");
+        }
+    }
+
+}
+----
+
+== Promise 정의
+
+____
+
+객체는 비동기 작업이 맞이할 미래의 완료 또는 실패와 그 결과 값을 나타냅니다.
+- 인용 https://developer.mozilla.org/ko/docs/Web/JavaScript/Reference/Global_Objects/Promise
+
+____
+
+== Promise란?
+
+____
+
+Promise는 생성된 시점에는 알려지지 않았을 수도 있는 값을 위한 대리자로, <br/>
+비동기 연산이 종료된 이후에 결과 값과 실패 사유를 처리하기 위한 처리기를 연결할 수 있습니다.<br/>
+프로미스를 사용하면 비동기 메서드에서 마치 동기 메서드처럼 값을 반환할 수 있습니다.<br/>
+다만 최종 결과를 반환하는 것이 아니고, 미래의 어떤 시점에 결과를 제공하겠다는 '약속'(프로미스)을 반환합니다.
+
+____
+
+== 상태
+
+* 대기(*pending)*: 이행하지도, 거부하지도 않은 초기 상태.
+* 이행(*fulfilled)*: 연산이 성공적으로 완료됨. ( success ).
+* 거부(*rejected)*: 연산이 실패함. ( 예외처리)
+
+=== `>5` resolve , `5<=` reject 호출 하는 예제..
+
+
+[source,js]
+----
+// Promise 객체의 생성
+const promise = new Promise((resolve, reject) => {
+setTimeout(function(){
+    const num =  getRandomInt(10);
+    if(num>5){
+        resolve(num);
+    }else{
+        reject(num);
+    }
+
+},1000);
+
+}).then(result=>{
+    console.log("success",result)
+})
+.catch(result=>{
+    console.log("error:",result);
+}).finally(function(){
+    console.log("무조건 실행");
+});
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+----

@@ -1,0 +1,129 @@
+= JDBC Driver & Connection
+
+* 본 교재에서는 mysql 8.x 사용합니다.
+
+== branch
+** https://github.com/nhnacademy-bootcamp/jdbc-exercise/tree/connection-driver-manager[connection-driver-manager]
+
+
+== JDBC Driver
+
+=== pom.xml
+* https://mvnrepository.com/artifact/com.mysql/mysql-connector-j
+
+[source,xml]
+----
+<dependency>
+    <groupId>com.mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+    <version>8.1.0</version>
+</dependency>
+----
+
+== MySQL JDBC 드라이버 로딩
+* JDBC 드라이버를 로딩하기 위하여 `Class.forName(java Reflection)` 을 사용합니다.
+* new `com.mysql.cj.jdbc.Driver()` 로 직접 초기화하지 않는 것은 응용시스템과 Driver 구현체가 강 결합하지 않도록 하기 위함입니다.
+* Driver 로드는 전체 프로젝트에서 한 번만 실행해야 합니다. (대부분의 드라이버 로드는 한 번만 실행하도록 방어 코드가 포함되어 있습니다.)
+
+=== Driver load ( Class.forName() ) 권장
+
+[,java]
+----
+Class.forName("com.mysql.cj.jdbc.Driver");
+----
+
+____
+JDBC 드라이버가 클래스 패스에 존재하지 않으면 ClassNotFoundException 이 발생합니다.
+Class.forName 메소드에서 `ClassNotFoundException` 을처리해 주어야 합니다.
+____
+
+[source,java]
+----
+    @Test
+    @DisplayName("mysql driver load : success")
+    void mtsql_driverLoadTest(){
+        try {
+            Class<?> driver = Class.forName("com.mysql.cj.jdbc.Driver");
+            log.info("driver:{}", driver.getName());
+            Assertions.assertEquals(driver.getName(),com.mysql.cj.jdbc.Driver.class.getName());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+----
+____
+JDBC 4.0 이후부터는 DriverManager 가 클래스패스에서 자동으로 드라이버를 로드합니다.
+____
+
+== Database Connection 생성
+
+* DriverManager는 자바 응용프로그램을 JDBC 드라이버에 연결시켜 주는 클래스입니다.
+* DriverManager의 getConnection 메소드로 Connection을 가져올 수 있습니다.
+
+[source,java]
+----
+Connection connection = DriverManager.getConnection(URL, user, password);
+----
+
+=== URL
+
+* URL에서 jdbc: 이후에 지정되는 형식은 데이터베이스 제조사마다 다릅니다. 제조사에서 정한 규칙에 따라 등록해야 합니다.
+* protocol : jdbc:mysql: , jdbc:mysql:loadbalance: , jdbc:mysql:replication: 등을 제공합니다. 여기서는 일반적인 프로토콜인 jdbc:mysql: 을 사용합니다.
+
+----
+protocol//[hosts][/database][?properties]
+----
+
+==== DbUtils.java
+
+[source,java]
+----
+public class DbUtils {
+    public DbUtils(){
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static Connection getConnection() {
+        Connection connection = null;
+        try {
+            //todo connection.
+            connection = DriverManager.getConnection("jdbc:mysql://address:3306/database_name","user","password");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return connection;
+    }
+}
+----
+
+
+== JDBC Connection Close
+
+* Connection 객체를 더 이상 사용하지 않을 때 Connection.close() 메소드를 호출합니다.
+* 시스템에서 `Connection` 을 `close()` 하지 않으면 메모리 누수가 발생하여 시스템 장애가 발생합니다.
+* 한번 close() 메소드가 호출된 Connection에 close(), isClosed(), isValid() 를 제외한 메소드 호출은 `SQLException` 을 발생시킵니다.
+
+[source,java]
+----
+  Connection conn = null;
+  PreparedStatement pstmt = null;
+  ResultSet rs = null;
+  try{
+     conn = ...<getConnection()>...;
+     pstmt = conn.prepareStatement("select .....");
+     rs = pstmt.executeQuery();
+     while(rs.next()){
+       ......
+     }
+  }  catch(Exception e){
+     ....
+  }  finally {
+     if ( rs != null ) try{rs.close();}catch(Exception e){}
+     if ( pstmt != null ) try{pstmt.close();}catch(Exception e){}
+     if ( conn != null ) try{conn.close();}catch(Exception e){}
+ }
+----
+
+== Reference
+* https://www.baeldung.com/java-jdbc-url-format[java-jdbc-url-format]
+* https://razorsql.com/docs/help_mysql.html[MySQL JDBC Driver and URL Information]

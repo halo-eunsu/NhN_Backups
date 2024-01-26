@@ -1,0 +1,22 @@
+= Semantic tags
+
+* 의미 없는 `<div>` 태그의 사용보다 문서의 내용을 쉽게 이해할 수 있도록 의미를 가지는 새로운 태그요소
+
+image:./images/image1.png[image1.png]
+
+== Semantic Elements
+
+|===
+|Tag명 |설명 
+
+|main |문서의 주요 콘텐츠를 포함, 문서 내에 단 하나만 존재 
+|header |문서 소개나 탐색을 돕는 요소들의 그룹 
+|nav |현재 페이지 내, 또는 다른 페이지로의 링크 
+|aside |주요 내용과 간접적으로만 연관된 부분 
+|section |문서의 일반적인 구획, 여러 줌심 내용을 감싸는 공간 
+|footer |문서의 아래쪽 작성자 구획, 저작권 데이터, 관련된 문서의 링크에 대한 정보 
+|figure |문서의 멀티미디어 요소 
+|article |글자가 많이 들어가는 부분(그 자체로 독립적으로 구분되거나 재사용 가능한 영역) 
+|===
+
+image:./images/image2.png[image2.png]

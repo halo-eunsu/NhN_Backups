@@ -1,0 +1,26 @@
+= JDBC
+
+* https://github.com/nhnacademy-bootcamp/jdbc-exercise[jdbc 실습,target=window] 참고하여 학습합니다.
+
+== 1day
+
+* JDBC란?
+* JDBC API?
+* JDBC Architecture
+* Connection
+* JDBC SQL Exception
+* Statement
+* PreparedStatement
+
+== 2day
+
+* Connection Pool
+* DBCP
+* JNDI
+* Transaction
+* Isolation Level
+
+== 3day
+
+* Join
+* Pagination

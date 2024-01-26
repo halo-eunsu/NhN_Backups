@@ -1,0 +1,41 @@
+= HTML 문서를 표현하는 모든 TAG는 두 분류중 하나에 속합니다.
+
+== Inline Tag
+
+* 자신의 내용과 앞뒤 태그의 내용을 같은 라인에 출력하는 태그
+* 대표적인 tag는 `<span></span>`
+
+* *반드시 알아야할 테그*
+
+[source,html]
+----
+<span>, <a>, <br>
+,<button>,<img>,<input>,<select>,<textarea>,<label>,<strong>
+
+----
+
+[source,html]
+----
+<abbr>, <acronym>, <b>, <bdo>, <big>, <cite>, <code>, <dfn>, <em>, <i>, <kbd>,<map>, <object>, <q>, <samp>, <small>, <script>,<sub>, <sup>,<tt>, <var>
+----
+
+== Block Tag
+
+* 자신의 내용과 앞뒤 태그의 내용을 다른 라인에 출력하는 태그(즉 좌우 너비가 100%)
+* 주로 구조를 만들 때 사용
+* 대표적인 tag는 `<div></div>`
+* 다만 `<p>` 태그는 내부에는 인라인 요소만 표현할 수 있습니다.
+
+* *반드시 알아야할 테그*
+
+[source,html]
+----
+<form>, <ul>, <p>, <table>, <div>,<address>
+<h1>,<h2>, <h3>, <h4>, <h5>, <h6>
+----
+
+[source,html]
+----
+<article>, <aside>, <audio>, <blockquote>, <canvas>, <dd>, <dl>, <fieldset>, <figcaption>, <figure>, <footer>,
+<header>, <hgroup>, <hr>, <noscript>, <ol>, <output>, <pre>, <section>, <video>
+----

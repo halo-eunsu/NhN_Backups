@@ -1,0 +1,148 @@
+= 자료형
+
+* JavaScript의 변수는 어떤 순간에는 문자열 또는 숫자가 될 수 있습니다.
+* 동적 타입 언어 : 자료형은 컴파일 시 자료형을 정하는 것이 아니고 실행 시점에 결정합니다.
+
+[source,javascript]
+----
+let msg = "welcome!";
+    msg = 100;
+
+----
+
+== 숫자형
+
+* 무한대
+** Infinity
+* 숫자 아님
+** NaN ( Not a Number )
+* BigInt
+** 2^53 -1 보다 큰 정소를 표현할 수 있는 내장 객체
+** 보다 작은 정수는 '숫자형’을 사용해 나타낼 수 없음
+** 정수 리터럴 끝에 n을 붙이면 만들 수 있음.
+
+[source,js]
+----
+let num = 123;
+num = 12.345678;
+console.log(100/0); // 무한대
+console.log(Infinity);  //무한대   Infinity를 직접 참조할 수 있습니다.
+console.log("Not a Number" / 100 ); // NaN , 문자열을 숫자로 나누면 NaN 오류가 발생 합니다. 
+console.log( 9007199254740991n); // BigInt -> 정수 리터럴 끝에 n을 붙이면 만들 수 있습니다.
+----
+
+== 문자형
+
+* 큰따옴표 : "marco"
+* 작은따옴표: 'marco'
+* 역 따옴표(백틱, backtick) : `marco`
+** ${변수명} 또는 표현식 ${ 100 + 200}을 문자열 중간에 손쉽게 넣을 수 있습니다.
+* 참고로 javascript는 c언어처럼 char 글자형을 지원하지 않습니다. 문자형에는 글자가 하나 혹은 여러 개가 할당될 수 있습니다.
+
+[source,js]
+----
+let myName="marco";
+let yourName="Ann";
+let phrse = `My name is ${myName}`;
+console.log(phrse);
+console.log(` result = ${100+200}`);
+----
+
+== 형변환
+
+* typeof –&gt; java의 instanceOf
+
+[source,JavaScript]
+----
+let text = "marco";
+console.log(text + " : " + typeof text);
+text = 100;
+console.log(text + " : " + typeof text);
+text = '100' + 10;
+console.log(text + " : " + typeof text);
+text = '100' / '10';
+console.log(text + " : " + typeof text);
+----
+
+== 불린형
+
+* true ( 긍정의 의미 )
+* false ( 부정의 의미 )
+
+[source,js]
+----
+console.log( 100>200 ); //false
+console.log( 100<200 ); //true
+let hour = 5;
+console.log(hour > 4 && hour < 6 ); //true
+----
+
+== null
+
+* 자료형 중 어느 자료형에도 속하지 않는 값
+* c언어나 java에서는 null을 존재하지 않는 객체에 대한 참조나 널 포인터를 타나낼 때 사용합니다.
+* 자바스크립트에서는 비어있는 값( Empty),  존재하지 않는 값(nothing), 알 수 없는 (unknown)값을 나타내는데 사용 합니다.
+
+[source,javascript]
+----
+let myName = null; // myName을 알 수 없거나 그 값이 비어있음
+----
+
+== undefined
+
+* 값이 할당되지 않는 상태를 나타낼 때 사용합니다.
+* 변수는 선언했지만, 값을 할당하지 않는다면 해당 변수에 undefined가 자동으로 할당됩니다.
+
+----
+let myName;
+console.log(myName);
+----
+
+== Object ( 객체 )
+
+* 원시타입과 ( 문자열,숫자 ) 달리 다양한 데이터를 담을 수 있습니다.
+* 키로 구분된 데이터 집합이나 복잡한 개체를 저장할 수 있습니다.
+
+[source,js]
+----
+let oldPeople = new Object(); // 객체 생성자 문법
+let youngPeople = {}; //객체 리터럴 문법
+let people = {
+    name : "marco",
+    age  : "40"
+};
+console.log(people.name);
+console.log(people.age);
+delete people.age;    // delete 연산자를 사용한 프로퍼티 삭제
+console.log(people.age);
+----
+
+== Map
+
+* JavaScript에 Map 존재합니다.
+* Map이 필요할 때 -&gt; Object 대신에 Map을 사용하세요.
+
+[source,javascript]
+----
+const map1 = new Map();
+
+map1.set('a', 1);
+map1.set('b', 2);
+map1.set('c', 3);
+
+console.log(map1.get('a'));
+// expected output: 1
+
+map1.set('a', 97);
+
+console.log(map1.get('a'));
+// expected output: 97
+
+console.log(map1.size);
+// expected output: 3
+
+map1.delete('b');
+
+console.log(map1.size);
+// expected output: 2
+----

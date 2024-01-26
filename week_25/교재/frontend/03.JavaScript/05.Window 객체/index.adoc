@@ -1,0 +1,26 @@
+= Window 객체
+
+* 브라우저 안의 모든 요소들이 소속된 객체, 최상위 객체, 전역 객체
+
+[source,js]
+----
+var myName = "marco";
+function getMyName(){
+    return myName;
+}
+
+console.log(window.myName);
+console.log(window.getMyName());
+
+----
+
+* 일반적으로 브라우저 창을 의미하며, 이 창을 제어하기 위한 다양한 메소드를 제공
+
+----
+console.log("window width : " + window.innerWidth);
+console.log("window height : " + window.innerHeight);
+
+window.open();
+----
+
+* https://developer.mozilla.org/ko/docs/Web/API/Window

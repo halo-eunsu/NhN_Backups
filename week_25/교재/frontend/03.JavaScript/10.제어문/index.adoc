@@ -1,0 +1,125 @@
+= 제어문
+
+== if/else
+
+[source,javascript]
+----
+if (condition_1) {
+  statement_1;
+} else if (condition_2) {
+  statement_2;
+} else if (condition_n) {
+  statement_n;
+} else {
+  statement_last;
+}
+
+----
+
+== switch
+
+[source,javascript]
+----
+switch (expression) {
+  case label_1:
+    statements_1
+    [break;]
+  case label_2:
+    statements_2
+    [break;]
+    ...
+  default:
+    statements_def
+    [break;]
+}
+
+----
+
+[source,javascript]
+----
+const expr = 'Papayas';
+switch (expr) {
+  case 'Oranges':
+    console.log('Oranges are $0.59 a pound.');
+    break;
+  case 'Mangoes':
+  case 'Papayas':
+    console.log('Mangoes and papayas are $2.79 a pound.');
+    // expected output: "Mangoes and papayas are $2.79 a pound."
+    break;
+  default:
+    console.log(`Sorry, we are out of ${expr}.`);
+}
+----
+
+== while
+
+[source,js]
+----
+while (condition)
+  statement
+----
+
+[source,js]
+----
+let count = 1;
+while(count<=10){
+    console.log(count++);
+}
+----
+
+== do while
+
+[source,javascript]
+----
+do{
+    구문
+}
+while (조건식);
+----
+
+== for
+
+[source,javascript]
+----
+for ([initialization]; [condition]; [final-expression])
+   statement
+----
+
+[source,js]
+----
+for(let i=0; i<10; i++){
+    //..
+}
+----
+
+== break
+
+[source,javascript]
+----
+let i = 0;
+
+while (i < 6) {
+  if (i === 3) {
+    break;
+  }
+  i = i + 1;
+}
+----
+
+== continue
+
+[source,javascript]
+----
+let text = '';
+
+for (let i = 0; i < 10; i++) {
+  if (i === 3) {
+    continue;
+  }
+  text = text + i;
+}
+
+console.log(text);
+// expected output: "012456789"
+----

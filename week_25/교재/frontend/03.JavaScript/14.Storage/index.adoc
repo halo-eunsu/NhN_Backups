@@ -1,0 +1,53 @@
+= Storage
+
+* Web Storage API의 Storage 인터페이스
+* 특정 도메인을 위한 세션 저장소 또는 로컬 저장소의 접근 경로로서 데이터를 추가하고 수정하거나 삭제할 수 있습니다.
+
+== 주요 메서드
+
+* Storage.key()
+* 주어진 숫자 n에 대하여 저장소의 n번째 항목 키를 반환합니다.
+* Storage.getItem()
+
+* 주어진 키에 연결된 값을 반환합니다.
+* Storage.setItem()
+
+* 키가 저장소에 존재하는 경우 값을 재설정합니다. 존재하지 않으면 키와 값을 저장소에 추가합니다.
+* Storage.removeItem()
+
+* 주어진 키를 저장소에서 제거합니다.
+* Storage.clear()
+
+* 저장소의 모든 키를 저장소에서 제거합니다.
+
+== localStorage
+
+* 브라우저 내에 키 -값 쌍을 저장할 수 있게 해줍니다.
+* 저장된 데이터는 브라우저가 종료 되어도 사라지지 않습니다.
+* 쿠키와 다르게 웹 스토리지 객체는 네트워크 요청시 서버로 전송되지 않습니다.( 쿠키값은 전송됨)
+* 서버가 HTTP 헤더를 통해 스토리지 객체를 조작할 수 없습니다. ( 모든 조작은 자바스크립트 내에서 수행됩니다.)
+* 대부분의 브라우저가 최소 2M 혹은 그 이상의 웹스토리지 객체를 저장할 수 있도록 해줍니다.
+
+[source,javascript]
+----
+localStorage.setItem('test', 1);
+console.log( localStorage.getItem('test') ); // 1
+----
+
+* 일반 객체처럼 사용하기
+
+[source,javascript]
+----
+localStorage.test = 2;
+alert( localStorage.test ); // 2
+
+// 키 삭제하기
+delete localStorage.test;
+----
+
+== sessionStorage
+
+* sessionStorage는 현재 떠 있는 탭 내에서만 유지됩니다.
+* 페이지를 새로 고침할 때 sessionStorage에 저장된 데이터는 사라지지 않습니다.
+* 탭을 닫고 새로 열 때는 사라집니다.
+* sessionStorage 객체는 localStorage에 비해 자주 사용되진 않습니다.
